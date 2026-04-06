@@ -35,7 +35,11 @@ The official [Cubox](https://cubox.pro) CLI tool — built for humans and AI Age
 **Option 1 — From npm (recommended):**
 
 ```bash
+# Install CLI
 npm install -g cubox-cli
+
+# Install CLI Skill (required for AI Agents)
+npx skills add OLCUBO/cubox-cli -g -y
 ```
 
 **Option 2 — From source:**
@@ -44,6 +48,9 @@ npm install -g cubox-cli
 git clone https://github.com/OLCUBO/cubox-cli.git
 cd cubox-cli
 make install
+
+# Install CLI Skill (required for AI Agents)
+npx skills add OLCUBO/cubox-cli -g -y
 ```
 
 #### Log in
@@ -83,7 +90,11 @@ cubox-cli card content --id CARD_ID
 **Step 1 — Install**
 
 ```bash
+# Install CLI
 npm install -g cubox-cli
+
+# Install CLI Skill (required)
+npx skills add OLCUBO/cubox-cli -g -y
 ```
 
 **Step 2 — Authenticate**

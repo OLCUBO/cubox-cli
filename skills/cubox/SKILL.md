@@ -10,10 +10,14 @@ Manage Cubox bookmarks via the `cubox-cli` command-line tool.
 
 ## First-time Setup
 
-If `cubox-cli` is not installed, install it:
+If `cubox-cli` is not installed, install CLI and Skill:
 
 ```bash
+# Install CLI
 npm install -g cubox-cli
+
+# Install CLI Skill (required)
+npx skills add OLCUBO/cubox-cli -g -y
 ```
 
 ### Authentication

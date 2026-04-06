@@ -37,7 +37,11 @@
 **方式一 — 通过 npm（推荐）：**
 
 ```bash
+# 安装 CLI
 npm install -g cubox-cli
+
+# 安装 CLI Skill（AI Agent 必需）
+npx skills add OLCUBO/cubox-cli -g -y
 ```
 
 **方式二 — 从源码构建：**
@@ -46,6 +50,9 @@ npm install -g cubox-cli
 git clone https://github.com/OLCUBO/cubox-cli.git
 cd cubox-cli
 make install
+
+# 安装 CLI Skill（AI Agent 必需）
+npx skills add OLCUBO/cubox-cli -g -y
 ```
 
 #### 登录
@@ -85,7 +92,11 @@ cubox-cli card content --id CARD_ID
 **步骤 1 — 安装**
 
 ```bash
+# 安装 CLI
 npm install -g cubox-cli
+
+# 安装 CLI Skill（必需）
+npx skills add OLCUBO/cubox-cli -g -y
 ```
 
 **步骤 2 — 认证**
