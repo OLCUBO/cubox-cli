@@ -1,8 +1,8 @@
 ---
-
-## name: cubox
+name: cubox
 version: 1.0.0
 description: "Cubox CLI: manage Cubox bookmarks — list groups/tags, filter cards, read card content. Use when the user wants to search, browse, or read their Cubox bookmarks, or needs to query Cubox data from the CLI."
+---
 
 # cubox-cli
 
