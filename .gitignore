@@ -24,9 +24,16 @@ profile.cov
 go.work
 go.work.sum
 
+# Built binary
+/cubox-cli
+/bin/
+
 # env file
 .env
 
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# npm
+node_modules/
