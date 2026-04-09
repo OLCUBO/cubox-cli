@@ -87,7 +87,7 @@ func (c *Client) doRequest(req *http.Request) (json.RawMessage, error) {
 }
 
 func (c *Client) ListGroups() ([]Group, error) {
-	data, err := c.get("/c/api/third-party/group/list", nil)
+	data, err := c.get("/c/api/cli/group/list", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (c *Client) ListGroups() ([]Group, error) {
 }
 
 func (c *Client) ListTags() ([]Tag, error) {
-	data, err := c.get("/c/api/third-party/tag/list", nil)
+	data, err := c.get("/c/api/cli/tag/list", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (c *Client) ListTags() ([]Tag, error) {
 }
 
 func (c *Client) FilterCards(req *CardFilterRequest) ([]Card, error) {
-	data, err := c.post("/c/api/third-party/card/filter", req)
+	data, err := c.post("/c/api/cli/card/filter", req)
 	if err != nil {
 		return nil, err
 	}
@@ -122,14 +122,36 @@ func (c *Client) FilterCards(req *CardFilterRequest) ([]Card, error) {
 	return cards, nil
 }
 
-func (c *Client) GetCardContent(id string) (string, error) {
-	data, err := c.get("/c/api/third-party/card/content", map[string]string{"id": id})
+func (c *Client) GetCardDetail(id string) (*CardDetail, error) {
+	data, err := c.get("/c/api/cli/card/detail", map[string]string{"id": id})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	var content string
-	if err := json.Unmarshal(data, &content); err != nil {
-		return "", fmt.Errorf("parsing content: %w", err)
+	var detail CardDetail
+	if err := json.Unmarshal(data, &detail); err != nil {
+		return nil, fmt.Errorf("parsing card detail: %w", err)
 	}
-	return content, nil
+	return &detail, nil
+}
+
+func (c *Client) SaveURLs(req *SaveURLsRequest) error {
+	_, err := c.post("/c/api/cli/card/save/urls", req)
+	return err
+}
+
+func (c *Client) UpdateCard(req *CardUpdateRequest) error {
+	_, err := c.post("/c/api/cli/card/update", req)
+	return err
+}
+
+func (c *Client) FilterMarks(req *MarkFilterRequest) ([]Mark, error) {
+	data, err := c.post("/c/api/cli/mark/filter", req)
+	if err != nil {
+		return nil, err
+	}
+	var marks []Mark
+	if err := json.Unmarshal(data, &marks); err != nil {
+		return nil, fmt.Errorf("parsing marks: %w", err)
+	}
+	return marks, nil
 }

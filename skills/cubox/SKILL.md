@@ -1,24 +1,16 @@
 ---
 name: cubox
 version: 1.0.0
-description: "Cubox CLI: manage Cubox bookmarks — list groups/tags, filter cards, read card content. Use when the user wants to search, browse, or read their Cubox bookmarks, or needs to query Cubox data from the CLI."
+description: "Cubox CLI: manage Cubox bookmarks — list groups/tags, filter/search cards, read card content with AI insight, save URLs, update cards, list highlights. Use when the user wants to search, browse, save, or read their Cubox bookmarks, or needs to query Cubox data from the CLI."
+metadata:
+  requires:
+    bins: ["cubox-cli"]
+  cliHelp: "cubox-cli --help"
 ---
 
 # cubox-cli
 
 Manage Cubox bookmarks via the `cubox-cli` command-line tool.
-
-## First-time Setup
-
-If `cubox-cli` is not installed, install CLI and Skill:
-
-```bash
-# Install CLI
-npm install -g cubox-cli
-
-# Install CLI Skill (required)
-npx skills add OLCUBO/cubox-cli -g -y
-```
 
 ### Authentication
 
@@ -57,64 +49,108 @@ cubox-cli tag list
 
 Returns: `[{ "id", "nested_name", "name", "parent_id" }]`
 
-### Filter Cards
+### Filter / Search Cards
 
 ```bash
 cubox-cli card list [flags]
 ```
 
 Flags:
-
 - `--group ID,...` — filter by group IDs
-- `--type Article,Snippet,...` — filter by type (Article, Snippet, Memo, Image, Audio, Video, File)
 - `--tag ID,...` — filter by tag IDs
 - `--starred` — starred cards only
 - `--read` / `--unread` — filter by read status
 - `--annotated` — cards with highlights only
+- `--keyword TEXT` — search by keyword
+- `--start-time`, `--end-time` — filter by create time (format: `2026-01-01T00:00:00:000+08:00`)
 - `--limit N` — page size (default 50)
-- `--cursor CARD_ID,UPDATE_TIME` — resume pagination from last card
+- `--last-id CARD_ID` — cursor pagination (non-search mode)
+- `--page N` — page-based pagination (search mode, 1-based)
 - `--all` — auto-paginate all results
 
-Returns: `[{ "id", "title", "description", "type", "tags", "url", "highlights", ... }]`
+**Pagination rules:**
+- When `--keyword` is set (search mode): use `--page` for pagination, `--last-id` is ignored
+- When `--keyword` is not set (browse mode): use `--last-id` for cursor-based pagination
 
-### Get Card Content
+Returns: `[{ "id", "title", "description", "domain", "read", "stared", "tags", "group", "url", ... }]`
+
+### Get Card Detail
 
 ```bash
-cubox-cli card content --id CARD_ID
+cubox-cli card detail --id CARD_ID
 ```
 
-Returns the full article content as markdown text.
+Returns full card with `content` (markdown), `author`, `highlights`, and `insight` (AI summary + Q&A). Use `-o text` to output only the markdown content.
+
+### Save URLs
+
+```bash
+cubox-cli save URL [URL...] [--group GROUP_ID] [--tag TAG_ID,...]
+```
+
+Save one or more web page URLs as bookmarks.
+
+### Update a Card
+
+```bash
+cubox-cli update --id CARD_ID [flags]
+```
+
+Flags:
+- `--star` / `--unstar` — toggle star
+- `--read` / `--unread` — toggle read status
+- `--archive` — archive the card
+- `--group GROUP_ID` — move to a group
+- `--add-tag TAG_ID,...` — add tags
+
+### List Highlights (Annotations)
+
+```bash
+cubox-cli mark list [flags]
+```
+
+Flags:
+- `--color Yellow,Green,Blue,Pink,Purple` — filter by color
+- `--keyword TEXT` — search highlights
+- `--start-time`, `--end-time` — filter by time
+- `--limit N` — page size (default 50)
+- `--last-id ID` — cursor pagination
+- `--all` — auto-paginate all results
+
+Returns: `[{ "id", "text", "note", "color", "card_id", ... }]`
 
 ## Common Workflows
 
 ### Browse and read a bookmark
 
 ```bash
-# 1. List groups to find the target folder
 cubox-cli group list
-
-# 2. Filter cards in that group
 cubox-cli card list --group GROUP_ID --limit 10
-
-# 3. Read the content
-cubox-cli card content --id CARD_ID
+cubox-cli card detail --id CARD_ID
 ```
 
-### Find starred articles
+### Search for articles
 
 ```bash
-cubox-cli card list --starred --type Article
+cubox-cli card list --keyword "machine learning" --page 1
 ```
 
-### Export all annotated cards
+### Save a URL and star it
 
 ```bash
-cubox-cli card list --annotated --all
+cubox-cli save https://example.com --group GROUP_ID
+cubox-cli update --id CARD_ID --star
+```
+
+### Export all highlights
+
+```bash
+cubox-cli mark list --all
 ```
 
 ## Notes
 
-- Pagination uses cursor-based approach. When `--all` is not used, the response may be partial. Use `--cursor` with the last card's ID and update_time to continue.
-- The `nested_name` field in groups and tags shows the full path (e.g. `"Parent/Child"`).
+- Browse pagination uses cursor-based approach (`--last-id`). Search pagination uses page numbers (`--page`).
+- The `nested_name` field in groups and tags shows the full hierarchy path (e.g. `"Parent/Child"`).
+- Card detail includes AI-generated `insight` with summary and Q&A pairs when available.
 - Config is stored at `~/.config/cubox-cli/config.json`.
-

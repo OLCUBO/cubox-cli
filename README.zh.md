@@ -13,12 +13,15 @@
 ## 功能
 
 
-| 类别  | 能力                             |
-| --- | ------------------------------ |
-| 收藏夹 | 列出和浏览书签文件夹                     |
-| 标签  | 列出和浏览标签层级                      |
-| 卡片  | 按收藏夹、类型、标签、星标/已读/标注状态过滤卡片；游标分页 |
-| 内容  | 以 Markdown 格式阅读文章全文            |
+| 类别  | 能力                                 |
+| --- | ---------------------------------- |
+| 收藏夹 | 列出和浏览书签文件夹                         |
+| 标签  | 列出和浏览标签层级                          |
+| 卡片  | 按收藏夹、标签、星标/已读/标注状态、关键词、时间范围过滤和搜索卡片 |
+| 详情  | 查看卡片全文（Markdown）、标注、AI 洞察（摘要 + 问答） |
+| 保存  | 保存网页链接为书签                          |
+| 更新  | 星标/取消星标、已读/未读、归档、移动收藏夹、添加标签        |
+| 标注  | 列出和搜索所有卡片的高亮标注                     |
 
 
 ## 安装
@@ -82,7 +85,7 @@ cubox-cli tag list
 cubox-cli card list --limit 5 -o pretty
 
 # 阅读一篇文章
-cubox-cli card content --id CARD_ID
+cubox-cli card detail --id CARD_ID
 ```
 
 ### AI Agent 快速开始
@@ -178,77 +181,138 @@ cubox-cli tag list -o text
 
 ### `cubox-cli card list`
 
-过滤和列出收藏卡片。
+过滤和搜索收藏卡片。支持关键词搜索（使用页码分页）和浏览模式（使用游标分页）。
 
 ```bash
 cubox-cli card list [flags]
 ```
 
 
-| 参数                 | 说明                                                                    |
-| ------------------ | --------------------------------------------------------------------- |
-| `--group ID,...`   | 按收藏夹 ID 过滤                                                            |
-| `--type TYPE,...`  | 按类型过滤：`Article`, `Snippet`, `Memo`, `Image`, `Audio`, `Video`, `File` |
-| `--tag ID,...`     | 按标签 ID 过滤                                                             |
-| `--starred`        | 仅星标卡片                                                                 |
-| `--read`           | 仅已读卡片                                                                 |
-| `--unread`         | 仅未读卡片                                                                 |
-| `--annotated`      | 仅有标注的卡片                                                               |
-| `--limit N`        | 每页数量（默认 50）                                                           |
-| `--cursor ID,TIME` | 分页游标，从上一张卡片继续                                                         |
-| `--all`            | 自动翻页获取全部结果                                                            |
+| 参数                  | 说明                                           |
+| ------------------- | -------------------------------------------- |
+| `--group ID,...`    | 按收藏夹 ID 过滤                                   |
+| `--tag ID,...`      | 按标签 ID 过滤                                    |
+| `--starred`         | 仅星标卡片                                        |
+| `--read`            | 仅已读卡片                                        |
+| `--unread`          | 仅未读卡片                                        |
+| `--annotated`       | 仅有标注的卡片                                      |
+| `--keyword TEXT`    | 关键词搜索                                        |
+| `--start-time TIME` | 按收藏开始时间过滤（如 `2026-01-01T00:00:00:000+08:00`） |
+| `--end-time TIME`   | 按收藏结束时间过滤                                    |
+| `--limit N`         | 每页数量（默认 50）                                  |
+| `--last-id CARD_ID` | 浏览模式的游标分页（非搜索）                               |
+| `--page N`          | 搜索模式的页码（从 1 开始，配合 `--keyword` 使用）            |
+| `--all`             | 自动翻页获取全部结果                                   |
 
 
-**JSON 输出字段：** `id`, `title`, `description`, `article_title`, `domain`, `type`, `tags`, `url`, `cubox_url`, `words_count`, `create_time`, `update_time`, `highlights`
+**分页规则：** 使用 `--keyword` 搜索时，用 `--page` 翻页；不搜索时，用 `--last-id` 游标分页。
 
-### `cubox-cli card content --id ID`
+### `cubox-cli card detail --id ID`
 
-获取文章全文（Markdown 格式）。
+获取卡片完整详情，包含文章全文（Markdown）、作者、标注和 AI 洞察（摘要 + 问答）。
 
 ```bash
-cubox-cli card content --id 7247925101516031380
+cubox-cli card detail --id 7247925101516031380
+cubox-cli card detail --id 7247925101516031380 -o pretty
 ```
 
-默认输出原始 Markdown。使用 `-o pretty` 获取 JSON 包装格式。
+使用 `-o text` 仅输出 Markdown 内容。
+
+### `cubox-cli save`
+
+保存一个或多个网页链接为书签。
+
+```bash
+cubox-cli save https://example.com
+cubox-cli save https://a.com https://b.com --group GROUP_ID
+cubox-cli save https://example.com --tag TAG_ID1,TAG_ID2
+```
+
+### `cubox-cli update`
+
+更新卡片属性。
+
+```bash
+cubox-cli update --id CARD_ID [flags]
+```
+
+
+| 参数                     | 说明      |
+| ---------------------- | ------- |
+| `--star` / `--unstar`  | 星标/取消星标 |
+| `--read` / `--unread`  | 已读/未读   |
+| `--archive`            | 归档      |
+| `--group GROUP_ID`     | 移动到收藏夹  |
+| `--add-tag TAG_ID,...` | 添加标签    |
+
+
+### `cubox-cli mark list`
+
+列出和搜索所有卡片的高亮标注。
+
+```bash
+cubox-cli mark list [flags]
+```
+
+
+| 参数                  | 说明                                                |
+| ------------------- | ------------------------------------------------- |
+| `--color COLOR,...` | 按颜色过滤：`Yellow`, `Green`, `Blue`, `Pink`, `Purple` |
+| `--keyword TEXT`    | 搜索标注                                              |
+| `--start-time TIME` | 按开始时间过滤                                           |
+| `--end-time TIME`   | 按结束时间过滤                                           |
+| `--limit N`         | 每页数量（默认 50）                                       |
+| `--last-id ID`      | 游标分页                                              |
+| `--all`             | 自动翻页获取全部结果                                        |
+
 
 ## 示例
 
-### 列出所有星标文章
+### 搜索文章
 
 ```bash
-cubox-cli card list --starred --type Article -o pretty
+cubox-cli card list --keyword "机器学习" --page 1 -o pretty
 ```
 
 ### 浏览特定收藏夹的卡片
 
 ```bash
-# 查找收藏夹 ID
 cubox-cli group list -o text
-
-# 列出该收藏夹的卡片
 cubox-cli card list --group 7230156249357091393 --limit 10
 ```
 
-### 阅读保存的文章
+### 阅读文章并查看 AI 洞察
 
 ```bash
-cubox-cli card content --id 7247925101516031380
+cubox-cli card detail --id 7247925101516031380 -o pretty
 ```
 
-### 获取所有带标注的卡片
+### 保存链接并加星标
 
 ```bash
-cubox-cli card list --annotated --all -o pretty
+cubox-cli save https://example.com
+cubox-cli update --id CARD_ID --star --read
 ```
 
-### 分页
+### 导出所有标注
 
 ```bash
-# 第一页
+cubox-cli mark list --all -o pretty
+```
+
+### 游标分页（浏览模式）
+
+```bash
 cubox-cli card list --limit 5
+# 使用最后一张卡片的 ID 获取下一页
+cubox-cli card list --limit 5 --last-id 7433152100604841820
+```
 
-# 使用最后一张卡片的 ID 和 update_time 获取下一页
-cubox-cli card list --limit 5 --cursor "7247925102807877551,2024-12-04T16:23:01:347+08:00"
+### 搜索分页
+
+```bash
+cubox-cli card list --keyword "AI" --page 1
+cubox-cli card list --keyword "AI" --page 2
 ```
 
 ## 开发
@@ -273,7 +337,10 @@ cubox-cli/
     auth.go               # auth login/status/logout
     group.go              # group list
     tag.go                # tag list
-    card.go               # card list, card content
+    card.go               # card list, card detail
+    save.go               # save 保存链接
+    update.go             # update 更新卡片
+    mark.go               # mark 标注列表
     version.go            # version
   internal/
     client/               # HTTP 客户端 + API 类型

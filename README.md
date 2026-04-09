@@ -1,8 +1,8 @@
 # cubox-cli
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Version](https://img.shields.io/badge/go-%3E%3D1.23-blue.svg)](https://go.dev/)
-[![npm version](https://img.shields.io/npm/v/cubox-cli.svg)](https://www.npmjs.com/package/cubox-cli)
+[License: MIT](https://opensource.org/licenses/MIT)
+[Go Version](https://go.dev/)
+[npm version](https://www.npmjs.com/package/cubox-cli)
 
 [English](./README.md) | [中文版](./README.zh.md)
 
@@ -12,12 +12,17 @@ The official [Cubox](https://cubox.pro) CLI tool — built for humans and AI Age
 
 ## Features
 
-| Category | Capabilities |
-|----------|-------------|
-| Groups | List and browse bookmark folders |
-| Tags | List and browse tag hierarchy |
-| Cards | Filter cards by group, type, tag, starred/read/annotated status; cursor-based pagination |
-| Content | Read full article content in markdown format |
+
+| Category | Capabilities                                                                          |
+| -------- | ------------------------------------------------------------------------------------- |
+| Groups   | List and browse bookmark folders                                                      |
+| Tags     | List and browse tag hierarchy                                                         |
+| Cards    | Filter/search cards by group, tag, starred/read/annotated status, keyword, time range |
+| Content  | Read full card detail with article content (markdown), highlights, and AI insight     |
+| Save     | Save web page URLs as bookmarks                                                       |
+| Update   | Star/unstar, mark read/unread, archive, move to group, add tags                       |
+| Marks    | List and search highlights/annotations across all cards                               |
+
 
 ## Installation
 
@@ -63,8 +68,8 @@ The CLI will guide you through:
 
 1. **Select your server** — `cubox.pro` (China) or `cubox.cc` (international)
 2. **Get your API key** — the CLI shows the URL to open:
-   - China: https://cubox.pro/web/settings/extensions
-   - International: https://cubox.cc/web/settings/extensions
+  - China: [https://cubox.pro/web/settings/extensions](https://cubox.pro/web/settings/extensions)
+  - International: [https://cubox.cc/web/settings/extensions](https://cubox.cc/web/settings/extensions)
 3. **Paste the API link** — copy the full link (e.g. `https://cubox.pro/c/api/save/abcdefg`) and paste it. The CLI extracts the token automatically.
 
 #### Start using
@@ -80,7 +85,7 @@ cubox-cli tag list
 cubox-cli card list --limit 5 -o pretty
 
 # Read an article
-cubox-cli card content --id CARD_ID
+cubox-cli card detail --id CARD_ID
 ```
 
 ### Quick Start (AI Agent)
@@ -127,12 +132,14 @@ cubox-cli card list --limit 10
 
 ## Authentication
 
-| Command | Description |
-|---------|-------------|
-| `cubox-cli auth login` | Interactive login (server selection + token input) |
-| `cubox-cli auth login --server cubox.pro --token TOKEN` | Non-interactive login (for agents) |
-| `cubox-cli auth status` | Show current server, masked token, connection test |
-| `cubox-cli auth logout` | Remove saved credentials |
+
+| Command                                                 | Description                                        |
+| ------------------------------------------------------- | -------------------------------------------------- |
+| `cubox-cli auth login`                                  | Interactive login (server selection + token input) |
+| `cubox-cli auth login --server cubox.pro --token TOKEN` | Non-interactive login (for agents)                 |
+| `cubox-cli auth status`                                 | Show current server, masked token, connection test |
+| `cubox-cli auth logout`                                 | Remove saved credentials                           |
+
 
 Credentials are stored at `~/.config/cubox-cli/config.json`.
 
@@ -142,11 +149,13 @@ Credentials are stored at `~/.config/cubox-cli/config.json`.
 
 All commands support the `-o` / `--output` flag:
 
-| Flag | Description |
-|------|-------------|
-| `-o json` | Compact JSON (default, agent-friendly) |
-| `-o pretty` | Indented JSON |
-| `-o text` | Human-readable text/tree output |
+
+| Flag        | Description                            |
+| ----------- | -------------------------------------- |
+| `-o json`   | Compact JSON (default, agent-friendly) |
+| `-o pretty` | Indented JSON                          |
+| `-o text`   | Human-readable text/tree output        |
+
 
 ### `cubox-cli group list`
 
@@ -172,75 +181,138 @@ cubox-cli tag list -o text
 
 ### `cubox-cli card list`
 
-Filter and list bookmark cards.
+Filter and search bookmark cards. Supports keyword search with page-based pagination, and cursor-based pagination for browsing.
 
 ```bash
 cubox-cli card list [flags]
 ```
 
-| Flag | Description |
-|------|-------------|
-| `--group ID,...` | Filter by group/folder IDs |
-| `--type TYPE,...` | Filter by type: `Article`, `Snippet`, `Memo`, `Image`, `Audio`, `Video`, `File` |
-| `--tag ID,...` | Filter by tag IDs |
-| `--starred` | Only starred cards |
-| `--read` | Only read cards |
-| `--unread` | Only unread cards |
-| `--annotated` | Only cards with highlights |
-| `--limit N` | Page size (default 50) |
-| `--cursor ID,TIME` | Resume from last card for pagination |
-| `--all` | Auto-paginate to fetch all results |
 
-**JSON output fields:** `id`, `title`, `description`, `article_title`, `domain`, `type`, `tags`, `url`, `cubox_url`, `words_count`, `create_time`, `update_time`, `highlights`
+| Flag                | Description                                                        |
+| ------------------- | ------------------------------------------------------------------ |
+| `--group ID,...`    | Filter by group/folder IDs                                         |
+| `--tag ID,...`      | Filter by tag IDs                                                  |
+| `--starred`         | Only starred cards                                                 |
+| `--read`            | Only read cards                                                    |
+| `--unread`          | Only unread cards                                                  |
+| `--annotated`       | Only cards with highlights                                         |
+| `--keyword TEXT`    | Search by keyword                                                  |
+| `--start-time TIME` | Filter by create time start (e.g. `2026-01-01T00:00:00:000+08:00`) |
+| `--end-time TIME`   | Filter by create time end                                          |
+| `--limit N`         | Page size (default 50)                                             |
+| `--last-id CARD_ID` | Cursor pagination for browsing (non-search)                        |
+| `--page N`          | Page number for search (1-based, used with `--keyword`)            |
+| `--all`             | Auto-paginate to fetch all results                                 |
 
-### `cubox-cli card content --id ID`
 
-Get the full article content in markdown format.
+**Pagination:** When `--keyword` is set, use `--page` for pagination. Otherwise, use `--last-id` with the last card's ID.
+
+### `cubox-cli card detail --id ID`
+
+Get full card detail including article content (markdown), author, highlights, and AI-generated insight (summary + Q&A).
 
 ```bash
-cubox-cli card content --id 7247925101516031380
+cubox-cli card detail --id 7247925101516031380
+cubox-cli card detail --id 7247925101516031380 -o pretty
 ```
 
-By default outputs raw markdown. Use `-o pretty` for a JSON envelope.
+Use `-o text` to output only the markdown content.
+
+### `cubox-cli save`
+
+Save one or more web page URLs as bookmarks.
+
+```bash
+cubox-cli save https://example.com
+cubox-cli save https://a.com https://b.com --group GROUP_ID
+cubox-cli save https://example.com --tag TAG_ID1,TAG_ID2
+```
+
+### `cubox-cli update`
+
+Update a card's properties.
+
+```bash
+cubox-cli update --id CARD_ID [flags]
+```
+
+
+| Flag                   | Description            |
+| ---------------------- | ---------------------- |
+| `--star` / `--unstar`  | Toggle star            |
+| `--read` / `--unread`  | Toggle read status     |
+| `--archive`            | Archive the card       |
+| `--group GROUP_ID`     | Move to a group/folder |
+| `--add-tag TAG_ID,...` | Add tags               |
+
+
+### `cubox-cli mark list`
+
+List and search highlights (annotations) across all cards.
+
+```bash
+cubox-cli mark list [flags]
+```
+
+
+| Flag                | Description                                                  |
+| ------------------- | ------------------------------------------------------------ |
+| `--color COLOR,...` | Filter by color: `Yellow`, `Green`, `Blue`, `Pink`, `Purple` |
+| `--keyword TEXT`    | Search highlights                                            |
+| `--start-time TIME` | Filter by start time                                         |
+| `--end-time TIME`   | Filter by end time                                           |
+| `--limit N`         | Page size (default 50)                                       |
+| `--last-id ID`      | Cursor pagination                                            |
+| `--all`             | Auto-paginate to fetch all results                           |
+
 
 ## Examples
 
-### List all starred articles
+### Search for articles
 
 ```bash
-cubox-cli card list --starred --type Article -o pretty
+cubox-cli card list --keyword "machine learning" --page 1 -o pretty
 ```
 
 ### Browse cards in a specific folder
 
 ```bash
-# Find the folder ID
 cubox-cli group list -o text
-
-# List cards in that folder
 cubox-cli card list --group 7230156249357091393 --limit 10
 ```
 
-### Read a saved article
+### Read a saved article with AI insight
 
 ```bash
-cubox-cli card content --id 7247925101516031380
+cubox-cli card detail --id 7247925101516031380 -o pretty
 ```
 
-### Fetch all annotated cards with highlights
+### Save a URL and star it
 
 ```bash
-cubox-cli card list --annotated --all -o pretty
+cubox-cli save https://example.com
+cubox-cli update --id CARD_ID --star --read
 ```
 
-### Pagination
+### Export all highlights
 
 ```bash
-# First page
+cubox-cli mark list --all -o pretty
+```
+
+### Cursor-based pagination (browsing)
+
+```bash
 cubox-cli card list --limit 5
+# Use last card's ID for the next page
+cubox-cli card list --limit 5 --last-id 7433152100604841820
+```
 
-# Use the last card's ID and update_time for the next page
-cubox-cli card list --limit 5 --cursor "7247925102807877551,2024-12-04T16:23:01:347+08:00"
+### Search pagination
+
+```bash
+cubox-cli card list --keyword "AI" --page 1
+cubox-cli card list --keyword "AI" --page 2
 ```
 
 ## Development
@@ -265,7 +337,10 @@ cubox-cli/
     auth.go               # auth login/status/logout
     group.go              # group list
     tag.go                # tag list
-    card.go               # card list, card content
+    card.go               # card list, card detail
+    save.go               # save URLs
+    update.go             # update card
+    mark.go               # mark (highlight) list
     version.go            # version
   internal/
     client/               # HTTP client + API types

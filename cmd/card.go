@@ -10,17 +10,20 @@ import (
 )
 
 var (
-	cardGroupFilter   []string
-	cardTypeFilter    []string
-	cardTagFilter     []string
-	cardStarred       bool
-	cardRead          bool
-	cardUnread        bool
-	cardAnnotated     bool
-	cardLimit         int
-	cardCursor        string
-	cardAll           bool
-	cardContentID     string
+	cardGroupFilter []string
+	cardTagFilter   []string
+	cardStarred     bool
+	cardRead        bool
+	cardUnread      bool
+	cardAnnotated   bool
+	cardLimit       int
+	cardLastID      string
+	cardAll         bool
+	cardKeyword     string
+	cardPage        int
+	cardStartTime   string
+	cardEndTime     string
+	cardDetailID    string
 )
 
 var cardCmd = &cobra.Command{
@@ -31,57 +34,62 @@ var cardCmd = &cobra.Command{
 var cardListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List and filter cards",
-	Long: `Filter and list bookmark cards.
+	Long: `Filter and list bookmark cards. Supports keyword search.
+
+When using --keyword for search, pagination uses --page (1-based).
+Without --keyword, pagination uses --last-id (cursor-based).
 
 Examples:
   cubox-cli card list
-  cubox-cli card list --type Article,Snippet --starred --limit 10
-  cubox-cli card list --group 7230156249357091393 --all`,
+  cubox-cli card list --starred --limit 10
+  cubox-cli card list --group 7230156249357091393 --all
+  cubox-cli card list --keyword "AI agent" --page 1
+  cubox-cli card list --start-time "2026-01-01T00:00:00:000+08:00"`,
 	RunE: runCardList,
 }
 
-var cardContentCmd = &cobra.Command{
-	Use:   "content",
-	Short: "Get card content in markdown",
-	Long: `Retrieve the full article content of a card in markdown format.
+var cardDetailCmd = &cobra.Command{
+	Use:   "detail",
+	Short: "Get full card detail with content, highlights, and AI insight",
+	Long: `Retrieve the full detail of a card including article content (markdown),
+highlights, and AI-generated insight (summary + Q&A).
 
 Examples:
-  cubox-cli card content --id 7247925101516031380
-  cubox-cli card content --id 7247925101516031380 -o json`,
-	RunE: runCardContent,
+  cubox-cli card detail --id 7247925101516031380
+  cubox-cli card detail --id 7247925101516031380 -o pretty`,
+	RunE: runCardDetail,
 }
 
 func init() {
 	cardListCmd.Flags().StringSliceVar(&cardGroupFilter, "group", nil, "filter by group IDs (comma-separated)")
-	cardListCmd.Flags().StringSliceVar(&cardTypeFilter, "type", nil, "filter by type: Article,Snippet,Memo,Image,Audio,Video,File")
 	cardListCmd.Flags().StringSliceVar(&cardTagFilter, "tag", nil, "filter by tag IDs (comma-separated, empty string = no tag)")
 	cardListCmd.Flags().BoolVar(&cardStarred, "starred", false, "only starred cards")
 	cardListCmd.Flags().BoolVar(&cardRead, "read", false, "only read cards")
 	cardListCmd.Flags().BoolVar(&cardUnread, "unread", false, "only unread cards")
 	cardListCmd.Flags().BoolVar(&cardAnnotated, "annotated", false, "only annotated cards")
 	cardListCmd.Flags().IntVar(&cardLimit, "limit", 50, "page size")
-	cardListCmd.Flags().StringVar(&cardCursor, "cursor", "", "pagination cursor: CARD_ID,UPDATE_TIME")
+	cardListCmd.Flags().StringVar(&cardLastID, "last-id", "", "last card ID for cursor pagination (non-search)")
 	cardListCmd.Flags().BoolVar(&cardAll, "all", false, "auto-paginate to fetch all results")
+	cardListCmd.Flags().StringVar(&cardKeyword, "keyword", "", "search keyword")
+	cardListCmd.Flags().IntVar(&cardPage, "page", 0, "page number for search pagination (1-based)")
+	cardListCmd.Flags().StringVar(&cardStartTime, "start-time", "", "filter by create time start (e.g. 2026-01-01T00:00:00:000+08:00)")
+	cardListCmd.Flags().StringVar(&cardEndTime, "end-time", "", "filter by create time end")
 
-	cardContentCmd.Flags().StringVar(&cardContentID, "id", "", "card ID (required)")
-	cardContentCmd.MarkFlagRequired("id")
+	cardDetailCmd.Flags().StringVar(&cardDetailID, "id", "", "card ID (required)")
+	cardDetailCmd.MarkFlagRequired("id")
 
-	cardCmd.AddCommand(cardListCmd, cardContentCmd)
+	cardCmd.AddCommand(cardListCmd, cardDetailCmd)
 	rootCmd.AddCommand(cardCmd)
 }
 
-func runCardList(cmd *cobra.Command, args []string) error {
-	cfg, err := config.Load()
-	if err != nil {
-		return err
-	}
-	c := client.New(cfg.BaseURL(), cfg.Token)
-
+func buildCardFilterRequest() *client.CardFilterRequest {
 	req := &client.CardFilterRequest{
 		GroupFilters: cardGroupFilter,
-		TypeFilters:  cardTypeFilter,
 		TagFilters:   cardTagFilter,
 		Limit:        cardLimit,
+		Keyword:      cardKeyword,
+		StartTime:    cardStartTime,
+		EndTime:      cardEndTime,
 	}
 
 	if cardStarred {
@@ -101,15 +109,27 @@ func runCardList(cmd *cobra.Command, args []string) error {
 		req.Annotated = &v
 	}
 
-	if cardCursor != "" {
-		parts := strings.SplitN(cardCursor, ",", 2)
-		if len(parts) == 2 {
-			req.LastCardID = parts[0]
-			req.LastCardUpdate = parts[1]
+	if cardKeyword != "" {
+		if cardPage > 0 {
+			req.Page = cardPage
 		} else {
-			return fmt.Errorf("invalid cursor format, expected CARD_ID,UPDATE_TIME")
+			req.Page = 1
 		}
+	} else {
+		req.LastCardID = cardLastID
 	}
+
+	return req
+}
+
+func runCardList(cmd *cobra.Command, args []string) error {
+	cfg, err := config.Load()
+	if err != nil {
+		return err
+	}
+	c := client.New(cfg.BaseURL(), cfg.Token)
+
+	req := buildCardFilterRequest()
 
 	if cardAll {
 		return runCardListAll(c, req)
@@ -130,18 +150,31 @@ func runCardList(cmd *cobra.Command, args []string) error {
 
 func runCardListAll(c *client.Client, req *client.CardFilterRequest) error {
 	var allCards []client.Card
-	for {
-		cards, err := c.FilterCards(req)
-		if err != nil {
-			return err
+
+	if req.Keyword != "" {
+		for page := 1; ; page++ {
+			req.Page = page
+			cards, err := c.FilterCards(req)
+			if err != nil {
+				return err
+			}
+			if len(cards) == 0 {
+				break
+			}
+			allCards = append(allCards, cards...)
 		}
-		if len(cards) == 0 {
-			break
+	} else {
+		for {
+			cards, err := c.FilterCards(req)
+			if err != nil {
+				return err
+			}
+			if len(cards) == 0 {
+				break
+			}
+			allCards = append(allCards, cards...)
+			req.LastCardID = cards[len(cards)-1].ID
 		}
-		allCards = append(allCards, cards...)
-		last := cards[len(cards)-1]
-		req.LastCardID = last.ID
-		req.LastCardUpdate = last.UpdateTime
 	}
 
 	if outputFormat == "text" {
@@ -152,41 +185,43 @@ func runCardListAll(c *client.Client, req *client.CardFilterRequest) error {
 	return nil
 }
 
-func runCardContent(cmd *cobra.Command, args []string) error {
+func runCardDetail(cmd *cobra.Command, args []string) error {
 	cfg, err := config.Load()
 	if err != nil {
 		return err
 	}
 	c := client.New(cfg.BaseURL(), cfg.Token)
 
-	content, err := c.GetCardContent(cardContentID)
+	detail, err := c.GetCardDetail(cardDetailID)
 	if err != nil {
 		return err
 	}
 
-	if outputFormat == "text" || outputFormat == "json" {
-		fmt.Print(content)
+	if outputFormat == "text" {
+		fmt.Print(detail.Content)
 		return nil
 	}
-	printJSON(map[string]string{"id": cardContentID, "content": content})
+	printJSON(detail)
 	return nil
 }
 
 func printCardsText(cards []client.Card) {
 	for _, c := range cards {
+		star := " "
+		if c.Starred {
+			star = "*"
+		}
+		readMark := " "
+		if c.Read {
+			readMark = "R"
+		}
 		tags := ""
 		if len(c.Tags) > 0 {
 			tags = " [" + strings.Join(c.Tags, ", ") + "]"
 		}
-		fmt.Printf("%s  %s  (%s)%s\n", c.ID, c.Title, c.Type, tags)
-		if c.Description != "" {
-			fmt.Printf("    %s\n", c.Description)
-		}
+		fmt.Printf("[%s%s] %s  %s%s\n", star, readMark, c.ID, c.Title, tags)
 		if c.URL != "" {
-			fmt.Printf("    %s\n", c.URL)
-		}
-		if len(c.Highlights) > 0 {
-			fmt.Printf("    %d highlight(s)\n", len(c.Highlights))
+			fmt.Printf("     %s\n", c.URL)
 		}
 		fmt.Println()
 	}
