@@ -6,6 +6,7 @@ import (
 
 	"github.com/OLCUBO/cubox-cli/internal/client"
 	"github.com/OLCUBO/cubox-cli/internal/config"
+	"github.com/OLCUBO/cubox-cli/internal/timefmt"
 	"github.com/spf13/cobra"
 )
 
@@ -44,7 +45,8 @@ Examples:
   cubox-cli card list --starred --limit 10
   cubox-cli card list --group 7230156249357091393 --all
   cubox-cli card list --keyword "AI agent" --page 1
-  cubox-cli card list --start-time "2026-01-01T00:00:00:000+08:00"`,
+  cubox-cli card list --start-time 2026-01-01
+  cubox-cli card list --start-time 7d --end-time today`,
 	RunE: runCardList,
 }
 
@@ -72,8 +74,8 @@ func init() {
 	cardListCmd.Flags().BoolVar(&cardAll, "all", false, "auto-paginate to fetch all results")
 	cardListCmd.Flags().StringVar(&cardKeyword, "keyword", "", "search keyword")
 	cardListCmd.Flags().IntVar(&cardPage, "page", 0, "page number for search pagination (1-based)")
-	cardListCmd.Flags().StringVar(&cardStartTime, "start-time", "", "filter by create time start (e.g. 2026-01-01T00:00:00:000+08:00)")
-	cardListCmd.Flags().StringVar(&cardEndTime, "end-time", "", "filter by create time end")
+	cardListCmd.Flags().StringVar(&cardStartTime, "start-time", "", "filter start time (today, yesterday, 7d, 2006-01-02, or full timestamp)")
+	cardListCmd.Flags().StringVar(&cardEndTime, "end-time", "", "filter end time (today, yesterday, 7d, 2006-01-02, or full timestamp)")
 
 	cardDetailCmd.Flags().StringVar(&cardDetailID, "id", "", "card ID (required)")
 	cardDetailCmd.MarkFlagRequired("id")
@@ -82,14 +84,23 @@ func init() {
 	rootCmd.AddCommand(cardCmd)
 }
 
-func buildCardFilterRequest() *client.CardFilterRequest {
+func buildCardFilterRequest() (*client.CardFilterRequest, error) {
+	startTime, err := timefmt.Parse(cardStartTime)
+	if err != nil {
+		return nil, fmt.Errorf("--start-time: %w", err)
+	}
+	endTime, err := timefmt.Parse(cardEndTime)
+	if err != nil {
+		return nil, fmt.Errorf("--end-time: %w", err)
+	}
+
 	req := &client.CardFilterRequest{
 		GroupFilters: cardGroupFilter,
 		TagFilters:   cardTagFilter,
 		Limit:        cardLimit,
 		Keyword:      cardKeyword,
-		StartTime:    cardStartTime,
-		EndTime:      cardEndTime,
+		StartTime:    startTime,
+		EndTime:      endTime,
 	}
 
 	if cardStarred {
@@ -119,7 +130,7 @@ func buildCardFilterRequest() *client.CardFilterRequest {
 		req.LastCardID = cardLastID
 	}
 
-	return req
+	return req, nil
 }
 
 func runCardList(cmd *cobra.Command, args []string) error {
@@ -129,7 +140,10 @@ func runCardList(cmd *cobra.Command, args []string) error {
 	}
 	c := client.New(cfg.BaseURL(), cfg.Token)
 
-	req := buildCardFilterRequest()
+	req, err := buildCardFilterRequest()
+	if err != nil {
+		return err
+	}
 
 	if cardAll {
 		return runCardListAll(c, req)

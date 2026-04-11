@@ -27,6 +27,7 @@ go.work.sum
 # Built binary
 /cubox-cli
 /bin/
+/dist
 
 # env file
 .env

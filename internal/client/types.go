@@ -31,7 +31,7 @@ type Card struct {
 	ArticleTitle string   `json:"article_title"`
 	Domain       string   `json:"domain"`
 	Read         bool     `json:"read"`
-	Starred      bool     `json:"stared"`
+	Starred      bool     `json:"starred"`
 	Tags         []string `json:"tags"`
 	Group        *Group   `json:"group,omitempty"`
 	URL          string   `json:"url"`
@@ -70,7 +70,7 @@ type CardDetail struct {
 	ArticleTitle string      `json:"article_title"`
 	Domain       string      `json:"domain"`
 	Read         bool        `json:"read"`
-	Starred      bool        `json:"stared"`
+	Starred      bool        `json:"starred"`
 	Tags         []string    `json:"tags"`
 	Group        *Group      `json:"group,omitempty"`
 	URL          string      `json:"url"`

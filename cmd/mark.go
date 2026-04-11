@@ -6,6 +6,7 @@ import (
 
 	"github.com/OLCUBO/cubox-cli/internal/client"
 	"github.com/OLCUBO/cubox-cli/internal/config"
+	"github.com/OLCUBO/cubox-cli/internal/timefmt"
 	"github.com/spf13/cobra"
 )
 
@@ -41,8 +42,8 @@ func init() {
 	markListCmd.Flags().StringVar(&markLastID, "last-id", "", "last highlight ID for cursor pagination")
 	markListCmd.Flags().IntVar(&markLimit, "limit", 50, "page size")
 	markListCmd.Flags().StringVar(&markKeyword, "keyword", "", "search keyword")
-	markListCmd.Flags().StringVar(&markStartTime, "start-time", "", "filter by start time")
-	markListCmd.Flags().StringVar(&markEndTime, "end-time", "", "filter by end time")
+	markListCmd.Flags().StringVar(&markStartTime, "start-time", "", "filter start time (today, yesterday, 7d, 2006-01-02, or full timestamp)")
+	markListCmd.Flags().StringVar(&markEndTime, "end-time", "", "filter end time (today, yesterday, 7d, 2006-01-02, or full timestamp)")
 	markListCmd.Flags().BoolVar(&markAll, "all", false, "auto-paginate to fetch all results")
 
 	markCmd.AddCommand(markListCmd)
@@ -56,13 +57,22 @@ func runMarkList(cmd *cobra.Command, args []string) error {
 	}
 	c := client.New(cfg.BaseURL(), cfg.Token)
 
+	startTime, err := timefmt.Parse(markStartTime)
+	if err != nil {
+		return fmt.Errorf("--start-time: %w", err)
+	}
+	endTime, err := timefmt.Parse(markEndTime)
+	if err != nil {
+		return fmt.Errorf("--end-time: %w", err)
+	}
+
 	req := &client.MarkFilterRequest{
 		Colors:          markColors,
 		LastHighlightID: markLastID,
 		Limit:           markLimit,
 		Keyword:         markKeyword,
-		StartTime:       markStartTime,
-		EndTime:         markEndTime,
+		StartTime:       startTime,
+		EndTime:         endTime,
 	}
 
 	if markAll {

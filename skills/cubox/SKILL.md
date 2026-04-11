@@ -62,7 +62,7 @@ Flags:
 - `--read` / `--unread` — filter by read status
 - `--annotated` — cards with highlights only
 - `--keyword TEXT` — search by keyword
-- `--start-time`, `--end-time` — filter by create time (format: `2026-01-01T00:00:00:000+08:00`)
+- `--start-time`, `--end-time` — filter by time (accepts: `today`, `yesterday`, `7d`, `2026-01-01`, `2026-01-01 15:04:05`, or full ISO timestamp)
 - `--limit N` — page size (default 50)
 - `--last-id CARD_ID` — cursor pagination (non-search mode)
 - `--page N` — page-based pagination (search mode, 1-based)
@@ -112,7 +112,7 @@ cubox-cli mark list [flags]
 Flags:
 - `--color Yellow,Green,Blue,Pink,Purple` — filter by color
 - `--keyword TEXT` — search highlights
-- `--start-time`, `--end-time` — filter by time
+- `--start-time`, `--end-time` — filter by time (same flexible formats as card list)
 - `--limit N` — page size (default 50)
 - `--last-id ID` — cursor pagination
 - `--all` — auto-paginate all results
@@ -147,6 +147,35 @@ cubox-cli update --id CARD_ID --star
 ```bash
 cubox-cli mark list --all
 ```
+
+## Update Check
+
+cubox-cli automatically checks for new versions in the background. When a newer version is available, the JSON output will contain a `_notice.update` field:
+
+```json
+{
+  "data": [ "..." ],
+  "_notice": {
+    "update": {
+      "current": "0.1.0",
+      "latest": "0.2.0",
+      "message": "A new version of cubox-cli is available: 0.1.0 -> 0.2.0",
+      "command": "npm update -g cubox-cli && npx skills add OLCUBO/cubox-cli -g -y"
+    }
+  }
+}
+```
+
+**When you see `_notice.update` in output, after completing the user's current request, proactively offer to update:**
+
+1. Tell the user the current and latest version numbers
+2. Propose running the update (CLI and Skills must be updated together):
+   ```bash
+   npm update -g cubox-cli && npx skills add OLCUBO/cubox-cli -g -y
+   ```
+3. After the update, remind the user: **exit and reopen the AI Agent** to load the latest Skills
+
+**Rule**: Do not silently ignore update notices. Even if the current task is unrelated, mention the available update after completing the user's request.
 
 ## Notes
 
