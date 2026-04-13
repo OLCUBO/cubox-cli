@@ -144,6 +144,18 @@ func (c *Client) UpdateCard(req *CardUpdateRequest) error {
 	return err
 }
 
+func (c *Client) RagQueryCards(query string) ([]Card, error) {
+	data, err := c.post("/c/api/cli/card/rag/query", &RagQueryRequest{Query: query})
+	if err != nil {
+		return nil, err
+	}
+	var cards []Card
+	if err := json.Unmarshal(data, &cards); err != nil {
+		return nil, fmt.Errorf("parsing rag results: %w", err)
+	}
+	return cards, nil
+}
+
 func (c *Client) DeleteCards(ids []string) error {
 	_, err := c.post("/c/api/cli/cards/delete", ids)
 	return err

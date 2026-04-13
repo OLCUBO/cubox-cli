@@ -111,6 +111,10 @@ type CardUpdateRequest struct {
 	AddTagIDs []string `json:"add_tag_ids,omitempty"`
 }
 
+type RagQueryRequest struct {
+	Query string `json:"query"`
+}
+
 type MarkFilterRequest struct {
 	Colors          []string `json:"colors,omitempty"`
 	LastHighlightID string   `json:"last_highlight_id,omitempty"`

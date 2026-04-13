@@ -18,6 +18,7 @@ The official [Cubox](https://cubox.pro) CLI tool — built for humans and AI Age
 | Groups   | List and browse bookmark folders                                                      |
 | Tags     | List and browse tag hierarchy                                                         |
 | Cards    | Filter/search cards by group, tag, starred/read/annotated status, keyword, time range |
+| RAG      | Semantic search via natural language query (intent-based retrieval)                    |
 | Content  | Read full card detail with article content (markdown), highlights, and AI insight     |
 | Save     | Save web page URLs as bookmarks                                                       |
 | Update   | Star/unstar, mark read/unread, archive, move to group, add tags                       |
@@ -219,6 +220,24 @@ cubox-cli card detail --id 7247925101516031380 -o pretty
 
 Use `-o text` to output only the markdown content.
 
+### `cubox-cli card rag --query TEXT`
+
+Semantic search using natural language via RAG (Retrieval-Augmented Generation). Unlike keyword search, RAG understands intent and returns conceptually relevant cards even when exact words don't match.
+
+```bash
+cubox-cli card rag --query "Java实现数据库图片上传功能"
+cubox-cli card rag --query "how to build a REST API with authentication" -o pretty
+```
+
+| Flag            | Description                            |
+| --------------- | -------------------------------------- |
+| `--query TEXT`  | Natural language query text (required) |
+
+**When to use RAG vs keyword search:**
+
+- **`card list --keyword`** — exact terms, known titles, domain names, short phrases
+- **`card rag --query`** — questions, topic exploration, conceptual or fuzzy queries
+
 ### `cubox-cli save`
 
 Save one or more web page URLs as bookmarks.
@@ -294,10 +313,16 @@ cubox-cli mark list [flags]
 
 ## Examples
 
-### Search for articles
+### Search for articles (keyword)
 
 ```bash
 cubox-cli card list --keyword "machine learning" --page 1 -o pretty
+```
+
+### Semantic search (RAG)
+
+```bash
+cubox-cli card rag --query "articles about building REST APIs with authentication" -o pretty
 ```
 
 ### Browse cards in a specific folder

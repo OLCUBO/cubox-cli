@@ -18,6 +18,7 @@
 | 收藏夹 | 列出和浏览书签文件夹                         |
 | 标签  | 列出和浏览标签层级                          |
 | 卡片  | 按收藏夹、标签、星标/已读/标注状态、关键词、时间范围过滤和搜索卡片 |
+| RAG  | 自然语言语义搜索（基于意图的智能检索）                 |
 | 详情  | 查看卡片全文（Markdown）、标注、AI 洞察（摘要 + 问答） |
 | 保存  | 保存网页链接为书签                          |
 | 更新  | 星标/取消星标、已读/未读、归档、移动收藏夹、添加标签        |
@@ -219,6 +220,24 @@ cubox-cli card detail --id 7247925101516031380 -o pretty
 
 使用 `-o text` 仅输出 Markdown 内容。
 
+### `cubox-cli card rag --query TEXT`
+
+通过 RAG（检索增强生成）进行自然语言语义搜索。与关键词搜索不同，RAG 理解查询意图，即使精确词汇不匹配也能返回概念相关的卡片。
+
+```bash
+cubox-cli card rag --query "Java实现数据库图片上传功能"
+cubox-cli card rag --query "如何构建带认证的 REST API" -o pretty
+```
+
+| 参数            | 说明                   |
+| ------------- | -------------------- |
+| `--query TEXT` | 自然语言查询文本（必填） |
+
+**何时用 RAG vs 关键词搜索：**
+
+- **`card list --keyword`** — 精确词汇、已知标题、域名、短语
+- **`card rag --query`** — 提问、主题探索、概念性或模糊查询
+
 ### `cubox-cli save`
 
 保存一个或多个网页链接为书签。
@@ -294,10 +313,16 @@ cubox-cli mark list [flags]
 
 ## 示例
 
-### 搜索文章
+### 搜索文章（关键词）
 
 ```bash
 cubox-cli card list --keyword "机器学习" --page 1 -o pretty
+```
+
+### 语义搜索（RAG）
+
+```bash
+cubox-cli card rag --query "如何用 Java 实现数据库图片上传并在前端展示" -o pretty
 ```
 
 ### 浏览特定收藏夹的卡片

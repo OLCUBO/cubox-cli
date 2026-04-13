@@ -62,6 +62,26 @@ Examples:
 	RunE: runCardDetail,
 }
 
+var cardRagQuery string
+
+var cardRagCmd = &cobra.Command{
+	Use:   "rag",
+	Short: "Semantic search cards via RAG query",
+	Long: `Search bookmark cards using natural language via RAG (Retrieval-Augmented
+Generation). Unlike keyword search (card list --keyword), RAG understands
+intent and semantics, returning cards that are conceptually relevant even
+when exact keywords don't match.
+
+Use this for questions, conceptual queries, or topic exploration.
+Use "card list --keyword" for exact or simple keyword matching.
+
+Examples:
+  cubox-cli card rag --query "Java实现数据库图片上传功能"
+  cubox-cli card rag --query "how to build a REST API with authentication"
+  cubox-cli card rag --query "recent articles about large language models"`,
+	RunE: runCardRag,
+}
+
 func init() {
 	cardListCmd.Flags().StringSliceVar(&cardGroupFilter, "group", nil, "filter by group IDs (comma-separated)")
 	cardListCmd.Flags().StringSliceVar(&cardTagFilter, "tag", nil, "filter by tag IDs (comma-separated, empty string = no tag)")
@@ -80,7 +100,10 @@ func init() {
 	cardDetailCmd.Flags().StringVar(&cardDetailID, "id", "", "card ID (required)")
 	cardDetailCmd.MarkFlagRequired("id")
 
-	cardCmd.AddCommand(cardListCmd, cardDetailCmd)
+	cardRagCmd.Flags().StringVar(&cardRagQuery, "query", "", "natural language query text (required)")
+	cardRagCmd.MarkFlagRequired("query")
+
+	cardCmd.AddCommand(cardListCmd, cardDetailCmd, cardRagCmd)
 	rootCmd.AddCommand(cardCmd)
 }
 
@@ -216,6 +239,26 @@ func runCardDetail(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 	printJSON(detail)
+	return nil
+}
+
+func runCardRag(cmd *cobra.Command, args []string) error {
+	cfg, err := config.Load()
+	if err != nil {
+		return err
+	}
+	c := client.New(cfg.BaseURL(), cfg.Token)
+
+	cards, err := c.RagQueryCards(cardRagQuery)
+	if err != nil {
+		return err
+	}
+
+	if outputFormat == "text" {
+		printCardsText(cards)
+		return nil
+	}
+	printJSON(cards)
 	return nil
 }
 
