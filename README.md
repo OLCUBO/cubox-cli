@@ -21,6 +21,7 @@ The official [Cubox](https://cubox.pro) CLI tool — built for humans and AI Age
 | Content  | Read full card detail with article content (markdown), highlights, and AI insight     |
 | Save     | Save web page URLs as bookmarks                                                       |
 | Update   | Star/unstar, mark read/unread, archive, move to group, add tags                       |
+| Delete   | Delete bookmark cards by ID, with dry-run preview support                             |
 | Marks    | List and search highlights/annotations across all cards                               |
 
 
@@ -246,6 +247,31 @@ cubox-cli update --id CARD_ID [flags]
 | `--add-tag TAG_ID,...` | Add tags               |
 
 
+### `cubox-cli delete`
+
+Delete one or more bookmark cards by ID. Supports `--dry-run` to preview what would be deleted before committing.
+
+```bash
+cubox-cli delete --id CARD_ID [flags]
+```
+
+
+| Flag            | Description                                            |
+| --------------- | ------------------------------------------------------ |
+| `--id ID,...`   | Card IDs to delete (comma-separated, required)         |
+| `--dry-run`     | Preview cards to be deleted without actually deleting   |
+
+
+**Dry Run:** Always use `--dry-run` first to preview which cards will be deleted. For ≤ 3 cards the preview includes title and URL; for larger batches only the count is shown to avoid expensive per-card lookups.
+
+```bash
+# Preview
+cubox-cli delete --id 7435692934957108160,7435691601617225646 --dry-run
+
+# Execute after confirming
+cubox-cli delete --id 7435692934957108160,7435691601617225646
+```
+
 ### `cubox-cli mark list`
 
 List and search highlights (annotations) across all cards.
@@ -294,6 +320,13 @@ cubox-cli save https://example.com
 cubox-cli update --id CARD_ID --star --read
 ```
 
+### Delete cards (with dry-run)
+
+```bash
+cubox-cli delete --id 7435692934957108160 --dry-run -o pretty
+cubox-cli delete --id 7435692934957108160
+```
+
 ### Export all highlights
 
 ```bash
@@ -340,6 +373,7 @@ cubox-cli/
     card.go               # card list, card detail
     save.go               # save URLs
     update.go             # update card
+    delete.go             # delete cards (with dry-run)
     mark.go               # mark (highlight) list
     version.go            # version
   internal/

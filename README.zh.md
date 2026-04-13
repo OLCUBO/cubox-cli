@@ -21,6 +21,7 @@
 | 详情  | 查看卡片全文（Markdown）、标注、AI 洞察（摘要 + 问答） |
 | 保存  | 保存网页链接为书签                          |
 | 更新  | 星标/取消星标、已读/未读、归档、移动收藏夹、添加标签        |
+| 删除  | 按 ID 删除收藏卡片，支持 dry-run 预览          |
 | 标注  | 列出和搜索所有卡片的高亮标注                     |
 
 
@@ -246,6 +247,31 @@ cubox-cli update --id CARD_ID [flags]
 | `--add-tag TAG_ID,...` | 添加标签    |
 
 
+### `cubox-cli delete`
+
+删除一个或多个收藏卡片。支持 `--dry-run` 预览将要删除的内容。
+
+```bash
+cubox-cli delete --id CARD_ID [flags]
+```
+
+
+| 参数            | 说明                 |
+| ------------- | ------------------ |
+| `--id ID,...` | 要删除的卡片 ID（逗号分隔，必填） |
+| `--dry-run`   | 预览将要删除的卡片，不实际执行删除  |
+
+
+**Dry Run：** 建议始终先使用 `--dry-run` 预览将要删除的卡片。删除 ≤ 3 张卡片时会预览标题和 URL；批量删除更多卡片时仅显示数量，避免逐个请求详情。
+
+```bash
+# 预览
+cubox-cli delete --id 7435692934957108160,7435691601617225646 --dry-run
+
+# 确认后执行
+cubox-cli delete --id 7435692934957108160,7435691601617225646
+```
+
 ### `cubox-cli mark list`
 
 列出和搜索所有卡片的高亮标注。
@@ -294,6 +320,13 @@ cubox-cli save https://example.com
 cubox-cli update --id CARD_ID --star --read
 ```
 
+### 删除卡片（带 dry-run）
+
+```bash
+cubox-cli delete --id 7435692934957108160 --dry-run -o pretty
+cubox-cli delete --id 7435692934957108160
+```
+
 ### 导出所有标注
 
 ```bash
@@ -340,6 +373,7 @@ cubox-cli/
     card.go               # card list, card detail
     save.go               # save 保存链接
     update.go             # update 更新卡片
+    delete.go             # delete 删除卡片（支持 dry-run）
     mark.go               # mark 标注列表
     version.go            # version
   internal/

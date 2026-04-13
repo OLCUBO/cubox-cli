@@ -144,6 +144,11 @@ func (c *Client) UpdateCard(req *CardUpdateRequest) error {
 	return err
 }
 
+func (c *Client) DeleteCards(ids []string) error {
+	_, err := c.post("/c/api/cli/cards/delete", ids)
+	return err
+}
+
 func (c *Client) FilterMarks(req *MarkFilterRequest) ([]Mark, error) {
 	data, err := c.post("/c/api/cli/mark/filter", req)
 	if err != nil {
