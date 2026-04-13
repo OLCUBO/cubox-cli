@@ -6,7 +6,7 @@
 
 [English](./README.md) | [中文版](./README.zh.md)
 
-[Cubox](https://cubox.pro) 官方命令行工具 — 为人类用户和 AI Agent 而设计。在终端中管理书签、浏览收藏夹、阅读保存的内容。
+Cubox 官方 CLI。收藏、搜索、阅读，并借助 AI 使用你读过的内容。让你的个人阅读记忆，真正被用起来。
 
 [安装](#安装) · [认证](#认证) · [命令](#命令) · [AI Agent](#ai-agent-快速开始) · [示例](#示例) · [开发](#开发)
 
@@ -15,15 +15,15 @@
 
 | 类别  | 能力                                 |
 | --- | ---------------------------------- |
-| 收藏夹 | 列出和浏览书签文件夹                         |
+| 收藏夹 | 列出和浏览文件夹                         |
 | 标签  | 列出和浏览标签层级                          |
 | 卡片  | 按收藏夹、标签、星标/已读/标注状态、关键词、时间范围过滤和搜索卡片 |
 | RAG  | 自然语言语义搜索（基于意图的智能检索）                 |
 | 详情  | 查看卡片全文（Markdown）、标注、AI 洞察（摘要 + 问答） |
-| 保存  | 保存网页链接为书签                          |
+| 保存  | 保存文章或网页链接                          |
 | 更新  | 星标/取消星标、已读/未读、归档、移动收藏夹、添加标签        |
 | 删除  | 按 ID 删除收藏卡片，支持 dry-run 预览          |
-| 标注  | 列出和搜索所有卡片的高亮标注                     |
+| 标注  | 列出和搜索所有卡片的标注，包含高亮和高亮笔记                     |
 
 
 ## 安装
@@ -39,7 +39,7 @@
 
 #### 安装
 
-**方式一 — 通过 npm（推荐）：**
+**方式一：通过 npm（推荐）**
 
 ```bash
 # 安装 CLI
@@ -49,7 +49,7 @@ npm install -g cubox-cli
 npx skills add OLCUBO/cubox-cli -g -y
 ```
 
-**方式二 — 从源码构建：**
+**方式二：从源码构建**
 
 ```bash
 git clone https://github.com/OLCUBO/cubox-cli.git
@@ -94,7 +94,7 @@ cubox-cli card detail --id CARD_ID
 
 > 以下步骤适用于 AI Agent 帮助用户设置 cubox-cli。
 
-**步骤 1 — 安装**
+**步骤 1：安装**
 
 ```bash
 # 安装 CLI
@@ -104,7 +104,7 @@ npm install -g cubox-cli
 npx skills add OLCUBO/cubox-cli -g -y
 ```
 
-**步骤 2 — 认证**
+**步骤 2：认证**
 
 询问用户使用哪个服务器（`cubox.pro` 或 `cubox.cc`），然后引导用户打开扩展设置页面并复制 API 链接：
 
@@ -119,13 +119,13 @@ cubox-cli auth login --server cubox.pro --token TOKEN
 
 `--token` 参数接受完整的 API 链接 URL 或纯 token 字符串。
 
-**步骤 3 — 验证**
+**步骤 3：验证**
 
 ```bash
 cubox-cli auth status
 ```
 
-**步骤 4 — 使用**
+**步骤 4：使用**
 
 ```bash
 cubox-cli group list
@@ -240,7 +240,7 @@ cubox-cli card rag --query "如何构建带认证的 REST API" -o pretty
 
 ### `cubox-cli save`
 
-保存一个或多个网页链接为书签。
+保存一个或多个网页链接。
 
 ```bash
 cubox-cli save https://example.com

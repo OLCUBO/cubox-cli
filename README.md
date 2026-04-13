@@ -6,7 +6,7 @@
 
 [English](./README.md) | [中文版](./README.zh.md)
 
-The official [Cubox](https://cubox.pro) CLI tool — built for humans and AI Agents. Manage your bookmarks, browse collections, and read saved content from the terminal.
+The official Cubox CLI. Save, search, read, and use what you read with AI. Your personal reading memory, now usable.
 
 [Install](#installation) · [Auth](#authentication) · [Commands](#commands) · [AI Agent](#quick-start-ai-agent) · [Examples](#examples) · [Development](#development)
 
@@ -20,7 +20,7 @@ The official [Cubox](https://cubox.pro) CLI tool — built for humans and AI Age
 | Cards    | Filter/search cards by group, tag, starred/read/annotated status, keyword, time range |
 | RAG      | Semantic search via natural language query (intent-based retrieval)                    |
 | Content  | Read full card detail with article content (markdown), annotations, and AI insight    |
-| Save     | Save web page URLs as bookmarks                                                       |
+| Save     | Save web page URLs                                                       |
 | Update   | Star/unstar, mark read/unread, archive, move to group, add tags                       |
 | Delete   | Delete cards by ID, with dry-run preview support                             |
 | Annotations | List and search annotations across all cards                                      |
@@ -240,7 +240,7 @@ cubox-cli card rag --query "how to build a REST API with authentication" -o pret
 
 ### `cubox-cli save`
 
-Save one or more web page URLs as bookmarks.
+Save one or more web page URLs.
 
 ```bash
 cubox-cli save https://example.com

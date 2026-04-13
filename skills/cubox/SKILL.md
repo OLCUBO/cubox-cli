@@ -1,7 +1,7 @@
 ---
 name: cubox
 version: 1.0.0
-description: "Cubox CLI: manage Cubox bookmarks — list groups/tags, filter/search cards, RAG semantic search, read card content with AI insight, save URLs, update/delete cards, list annotations. Use when the user wants to search, browse, save, or read their Cubox bookmarks, or needs to query Cubox data from the CLI."
+description: "The official Cubox CLI. Save, search, read, and use what you read with AI. Your personal reading memory, now usable."
 metadata:
   requires:
     bins: ["cubox-cli"]
