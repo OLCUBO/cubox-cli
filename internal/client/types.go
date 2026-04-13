@@ -23,6 +23,17 @@ type Tag struct {
 	ParentID   *string `json:"parent_id"`
 }
 
+type Annotation struct {
+	ID         string `json:"id"`
+	Text       string `json:"text"`
+	Note       string `json:"note"`
+	ImageURL   string `json:"image_url"`
+	Color      string `json:"color"`
+	CardID     string `json:"card_id"`
+	CreateTime string `json:"create_time"`
+	UpdateTime string `json:"update_time"`
+}
+
 // Card is the shape returned by the card/filter list endpoint.
 type Card struct {
 	ID           string   `json:"id"`
@@ -37,16 +48,6 @@ type Card struct {
 	URL          string   `json:"url"`
 	CreateTime   string   `json:"create_time"`
 	UpdateTime   string   `json:"update_time"`
-}
-
-type Highlight struct {
-	ID         string `json:"id"`
-	Text       string `json:"text"`
-	ImageURL   string `json:"image_url"`
-	CuboxURL   string `json:"cubox_url,omitempty"`
-	Note       string `json:"note"`
-	Color      string `json:"color"`
-	CreateTime string `json:"create_time"`
 }
 
 type InsightQA struct {
@@ -64,22 +65,22 @@ type Insight struct {
 
 // CardDetail is the full shape returned by the card/detail endpoint.
 type CardDetail struct {
-	ID           string      `json:"id"`
-	Title        string      `json:"title"`
-	Description  string      `json:"description"`
-	ArticleTitle string      `json:"article_title"`
-	Domain       string      `json:"domain"`
-	Read         bool        `json:"read"`
-	Starred      bool        `json:"starred"`
-	Tags         []string    `json:"tags"`
-	Group        *Group      `json:"group,omitempty"`
-	URL          string      `json:"url"`
-	CreateTime   string      `json:"create_time"`
-	UpdateTime   string      `json:"update_time"`
-	Content      string      `json:"content"`
-	Author       string      `json:"author"`
-	Highlights   []Highlight `json:"highlights"`
-	Insight      *Insight    `json:"insight,omitempty"`
+	ID           string           `json:"id"`
+	Title        string           `json:"title"`
+	Description  string           `json:"description"`
+	ArticleTitle string           `json:"article_title"`
+	Domain       string           `json:"domain"`
+	Read         bool             `json:"read"`
+	Starred      bool             `json:"starred"`
+	Tags         []string         `json:"tags"`
+	Group        *Group           `json:"group,omitempty"`
+	URL          string           `json:"url"`
+	CreateTime   string           `json:"create_time"`
+	UpdateTime   string           `json:"update_time"`
+	Content      string           `json:"content"`
+	Author       string           `json:"author"`
+	Annotations  []Annotation     `json:"annotations"`
+	Insight      *Insight         `json:"insight,omitempty"`
 }
 
 type CardFilterRequest struct {
@@ -115,22 +116,12 @@ type RagQueryRequest struct {
 	Query string `json:"query"`
 }
 
-type MarkFilterRequest struct {
-	Colors          []string `json:"colors,omitempty"`
-	LastHighlightID string   `json:"last_highlight_id,omitempty"`
-	Limit           int      `json:"limit,omitempty"`
-	Keyword         string   `json:"keyword,omitempty"`
-	StartTime       string   `json:"start_time,omitempty"`
-	EndTime         string   `json:"end_time,omitempty"`
+type AnnotationFilterRequest struct {
+	Colors           []string `json:"colors,omitempty"`
+	LastAnnotationID string   `json:"last_annotation_id,omitempty"`
+	Limit            int      `json:"limit,omitempty"`
+	Keyword          string   `json:"keyword,omitempty"`
+	StartTime        string   `json:"start_time,omitempty"`
+	EndTime          string   `json:"end_time,omitempty"`
 }
 
-type Mark struct {
-	ID         string `json:"id"`
-	Text       string `json:"text"`
-	Note       string `json:"note"`
-	ImageURL   string `json:"image_url"`
-	Color      string `json:"color"`
-	CardID     string `json:"card_id"`
-	CreateTime string `json:"create_time"`
-	UpdateTime string `json:"update_time"`
-}

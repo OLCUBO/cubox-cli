@@ -15,15 +15,15 @@ The official [Cubox](https://cubox.pro) CLI tool — built for humans and AI Age
 
 | Category | Capabilities                                                                          |
 | -------- | ------------------------------------------------------------------------------------- |
-| Groups   | List and browse bookmark folders                                                      |
+| Groups   | List and browse card folders                                                      |
 | Tags     | List and browse tag hierarchy                                                         |
 | Cards    | Filter/search cards by group, tag, starred/read/annotated status, keyword, time range |
 | RAG      | Semantic search via natural language query (intent-based retrieval)                    |
-| Content  | Read full card detail with article content (markdown), highlights, and AI insight     |
+| Content  | Read full card detail with article content (markdown), annotations, and AI insight    |
 | Save     | Save web page URLs as bookmarks                                                       |
 | Update   | Star/unstar, mark read/unread, archive, move to group, add tags                       |
-| Delete   | Delete bookmark cards by ID, with dry-run preview support                             |
-| Marks    | List and search highlights/annotations across all cards                               |
+| Delete   | Delete cards by ID, with dry-run preview support                             |
+| Annotations | List and search annotations across all cards                                      |
 
 
 ## Installation
@@ -161,7 +161,7 @@ All commands support the `-o` / `--output` flag:
 
 ### `cubox-cli group list`
 
-List all bookmark groups (folders).
+List all card groups (folders).
 
 ```bash
 cubox-cli group list
@@ -183,7 +183,7 @@ cubox-cli tag list -o text
 
 ### `cubox-cli card list`
 
-Filter and search bookmark cards. Supports keyword search with page-based pagination, and cursor-based pagination for browsing.
+Filter and search cards. Supports keyword search with page-based pagination, and cursor-based pagination for browsing.
 
 ```bash
 cubox-cli card list [flags]
@@ -197,7 +197,7 @@ cubox-cli card list [flags]
 | `--starred`         | Only starred cards                                                 |
 | `--read`            | Only read cards                                                    |
 | `--unread`          | Only unread cards                                                  |
-| `--annotated`       | Only cards with highlights                                         |
+| `--annotated`       | Only cards with annotations                                        |
 | `--keyword TEXT`    | Search by keyword                                                  |
 | `--start-time TIME` | Filter by create time start (e.g. `2026-01-01T00:00:00:000+08:00`) |
 | `--end-time TIME`   | Filter by create time end                                          |
@@ -211,7 +211,7 @@ cubox-cli card list [flags]
 
 ### `cubox-cli card detail --id ID`
 
-Get full card detail including article content (markdown), author, highlights, and AI-generated insight (summary + Q&A).
+Get full card detail including article content (markdown), author, annotations, and AI-generated insight (summary + Q&A).
 
 ```bash
 cubox-cli card detail --id 7247925101516031380
@@ -268,7 +268,7 @@ cubox-cli update --id CARD_ID [flags]
 
 ### `cubox-cli delete`
 
-Delete one or more bookmark cards by ID. Supports `--dry-run` to preview what would be deleted before committing.
+Delete one or more cards by ID. Supports `--dry-run` to preview what would be deleted before committing.
 
 ```bash
 cubox-cli delete --id CARD_ID [flags]
@@ -291,19 +291,19 @@ cubox-cli delete --id 7435692934957108160,7435691601617225646 --dry-run
 cubox-cli delete --id 7435692934957108160,7435691601617225646
 ```
 
-### `cubox-cli mark list`
+### `cubox-cli annotation list`
 
-List and search highlights (annotations) across all cards.
+List and search annotations across all cards.
 
 ```bash
-cubox-cli mark list [flags]
+cubox-cli annotation list [flags]
 ```
 
 
 | Flag                | Description                                                  |
 | ------------------- | ------------------------------------------------------------ |
 | `--color COLOR,...` | Filter by color: `Yellow`, `Green`, `Blue`, `Pink`, `Purple` |
-| `--keyword TEXT`    | Search highlights                                            |
+| `--keyword TEXT`    | Search annotations                                          |
 | `--start-time TIME` | Filter by start time                                         |
 | `--end-time TIME`   | Filter by end time                                           |
 | `--limit N`         | Page size (default 50)                                       |
@@ -352,10 +352,10 @@ cubox-cli delete --id 7435692934957108160 --dry-run -o pretty
 cubox-cli delete --id 7435692934957108160
 ```
 
-### Export all highlights
+### Export all annotations
 
 ```bash
-cubox-cli mark list --all -o pretty
+cubox-cli annotation list --all -o pretty
 ```
 
 ### Cursor-based pagination (browsing)
@@ -399,7 +399,7 @@ cubox-cli/
     save.go               # save URLs
     update.go             # update card
     delete.go             # delete cards (with dry-run)
-    mark.go               # mark (highlight) list
+    annotation.go         # annotation list
     version.go            # version
   internal/
     client/               # HTTP client + API types

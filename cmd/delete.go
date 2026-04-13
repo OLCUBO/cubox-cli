@@ -18,8 +18,8 @@ var (
 
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "Delete bookmark cards",
-	Long: `Delete one or more bookmark cards by ID.
+	Short: "Delete cards",
+	Long: `Delete one or more cards by ID.
 
 Use --dry-run to preview which cards would be deleted without actually
 removing them. This is especially recommended when scripting or when

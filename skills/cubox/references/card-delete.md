@@ -1,6 +1,6 @@
 # card delete — Dry Run Policy
 
-Delete one or more bookmark cards by ID.
+Delete one or more cards by ID.
 
 ```bash
 cubox-cli delete --id CARD_ID [--id ID2,...] [--dry-run]

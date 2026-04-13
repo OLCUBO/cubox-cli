@@ -1,7 +1,7 @@
 ---
 name: cubox
 version: 1.0.0
-description: "Cubox CLI: manage Cubox bookmarks — list groups/tags, filter/search cards, RAG semantic search, read card content with AI insight, save URLs, update/delete cards, list highlights. Use when the user wants to search, browse, save, or read their Cubox bookmarks, or needs to query Cubox data from the CLI."
+description: "Cubox CLI: manage Cubox bookmarks — list groups/tags, filter/search cards, RAG semantic search, read card content with AI insight, save URLs, update/delete cards, list annotations. Use when the user wants to search, browse, save, or read their Cubox bookmarks, or needs to query Cubox data from the CLI."
 metadata:
   requires:
     bins: ["cubox-cli"]
@@ -11,23 +11,6 @@ metadata:
 # cubox-cli
 
 Manage Cubox bookmarks via the `cubox-cli` command-line tool.
-
-### Authentication
-
-Check if already logged in:
-
-```bash
-cubox-cli auth status
-```
-
-If not logged in, authenticate non-interactively:
-
-```bash
-cubox-cli auth login --server cubox.pro --token YOUR_API_KEY
-```
-
-- `--server`: `cubox.pro` (China) or `cubox.cc` (international)
-- `--token`: API key from the extensions page. The user should open `https://{server}/web/settings/extensions`, copy the full API link (e.g. `https://cubox.pro/c/api/save/aq3Ir2xW3y2`), and provide the last path segment (`aq3Ir2xW3y2`) as the token. The CLI also accepts the full URL and extracts the token automatically.
 
 ## Commands
 
@@ -60,7 +43,7 @@ Flags:
 - `--tag ID,...` — filter by tag IDs
 - `--starred` — starred cards only
 - `--read` / `--unread` — filter by read status
-- `--annotated` — cards with highlights only
+- `--annotated` — cards with annotations only
 - `--keyword TEXT` — search by keyword
 - `--start-time`, `--end-time` — filter by time (accepts: `today`, `yesterday`, `7d`, `2026-01-01`, `2026-01-01 15:04:05`, or full ISO timestamp)
 - `--limit N` — page size (default 50)
@@ -80,7 +63,7 @@ Returns: `[{ "id", "title", "description", "domain", "read", "starred", "tags", 
 cubox-cli card detail --id CARD_ID
 ```
 
-Returns full card with `content` (markdown), `author`, `highlights`, and `insight` (AI summary + Q&A). Use `-o text` to output only the markdown content.
+Returns full card with `content` (markdown), `author`, `annotations`, and `insight` (AI summary + Q&A). Use `-o text` to output only the markdown content.
 
 ### RAG Semantic Search
 
@@ -121,15 +104,15 @@ cubox-cli delete --id CARD_ID [--id ID2,...] [--dry-run]
 
 Delete cards by ID. **Always `--dry-run` first.** [**Must-read: Dry Run Policy**](references/card-delete.md) — agents must preview before deleting.
 
-### List Highlights (Annotations)
+### List Annotations
 
 ```bash
-cubox-cli mark list [flags]
+cubox-cli annotation list [flags]
 ```
 
 Flags:
 - `--color Yellow,Green,Blue,Pink,Purple` — filter by color
-- `--keyword TEXT` — search highlights
+- `--keyword TEXT` — search annotations
 - `--start-time`, `--end-time` — filter by time (same flexible formats as card list)
 - `--limit N` — page size (default 50)
 - `--last-id ID` — cursor pagination
@@ -139,7 +122,7 @@ Returns: `[{ "id", "text", "note", "color", "card_id", ... }]`
 
 ## Common Workflows
 
-### Browse and read a bookmark
+### Browse and read a card detail
 
 ```bash
 cubox-cli group list
@@ -160,18 +143,10 @@ cubox-cli save https://example.com --group GROUP_ID
 cubox-cli update --id CARD_ID --star
 ```
 
-### Delete bookmarks (always dry-run first)
+### Export all annotations
 
 ```bash
-cubox-cli delete --id CARD_ID1,CARD_ID2 --dry-run
-# Present the preview to the user and wait for confirmation
-cubox-cli delete --id CARD_ID1,CARD_ID2
-```
-
-### Export all highlights
-
-```bash
-cubox-cli mark list --all
+cubox-cli annotation list --all
 ```
 
 ## Update Check
@@ -202,6 +177,15 @@ cubox-cli automatically checks for new versions in the background. When a newer 
 3. After the update, remind the user: **exit and reopen the AI Agent** to load the latest Skills
 
 **Rule**: Do not silently ignore update notices. Even if the current task is unrelated, mention the available update after completing the user's request.
+
+## Security Rules
+
+- Never expose sensitive credentials in plain text (API key/token, session data, auth headers).
+- Treat Cubox API tokens as local secrets. Do not commit or copy them into repository files, screenshots, or shared notes.
+- Before any write/destructive action (`save`, `update`, `delete`), confirm user intent first. For deletion, always run `--dry-run` and present the preview before execution.
+- When demonstrating commands, use placeholders (for example `YOUR_API_KEY`) instead of real values.
+- Avoid leaving secrets in shell history where possible (for example, prefer temporary environment variables and clear them after use).
+- If credentials are suspected to be leaked, instruct the user to rotate the Cubox API token from the extensions page immediately.
 
 ## Notes
 

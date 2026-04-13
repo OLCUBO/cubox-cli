@@ -35,7 +35,7 @@ var cardCmd = &cobra.Command{
 var cardListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List and filter cards",
-	Long: `Filter and list bookmark cards. Supports keyword search.
+	Long: `Filter and list cards. Supports keyword search.
 
 When using --keyword for search, pagination uses --page (1-based).
 Without --keyword, pagination uses --last-id (cursor-based).
@@ -52,9 +52,9 @@ Examples:
 
 var cardDetailCmd = &cobra.Command{
 	Use:   "detail",
-	Short: "Get full card detail with content, highlights, and AI insight",
+	Short: "Get full card detail with content, annotations, and AI insight",
 	Long: `Retrieve the full detail of a card including article content (markdown),
-highlights, and AI-generated insight (summary + Q&A).
+annotations, and AI-generated insight (summary + Q&A).
 
 Examples:
   cubox-cli card detail --id 7247925101516031380
@@ -67,7 +67,7 @@ var cardRagQuery string
 var cardRagCmd = &cobra.Command{
 	Use:   "rag",
 	Short: "Semantic search cards via RAG query",
-	Long: `Search bookmark cards using natural language via RAG (Retrieval-Augmented
+	Long: `Search cards using natural language via RAG (Retrieval-Augmented
 Generation). Unlike keyword search (card list --keyword), RAG understands
 intent and semantics, returning cards that are conceptually relevant even
 when exact keywords don't match.

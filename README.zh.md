@@ -291,12 +291,12 @@ cubox-cli delete --id 7435692934957108160,7435691601617225646 --dry-run
 cubox-cli delete --id 7435692934957108160,7435691601617225646
 ```
 
-### `cubox-cli mark list`
+### `cubox-cli annotation list`
 
 列出和搜索所有卡片的高亮标注。
 
 ```bash
-cubox-cli mark list [flags]
+cubox-cli annotation list [flags]
 ```
 
 
@@ -355,7 +355,7 @@ cubox-cli delete --id 7435692934957108160
 ### 导出所有标注
 
 ```bash
-cubox-cli mark list --all -o pretty
+cubox-cli annotation list --all -o pretty
 ```
 
 ### 游标分页（浏览模式）
@@ -399,7 +399,7 @@ cubox-cli/
     save.go               # save 保存链接
     update.go             # update 更新卡片
     delete.go             # delete 删除卡片（支持 dry-run）
-    mark.go               # mark 标注列表
+    annotation.go         # annotation 标注列表
     version.go            # version
   internal/
     client/               # HTTP 客户端 + API 类型

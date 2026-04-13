@@ -161,14 +161,14 @@ func (c *Client) DeleteCards(ids []string) error {
 	return err
 }
 
-func (c *Client) FilterMarks(req *MarkFilterRequest) ([]Mark, error) {
-	data, err := c.post("/c/api/cli/mark/filter", req)
+func (c *Client) FilterAnnotations(req *AnnotationFilterRequest) ([]Annotation, error) {
+	data, err := c.post("/c/api/cli/annotation/filter", req)
 	if err != nil {
 		return nil, err
 	}
-	var marks []Mark
-	if err := json.Unmarshal(data, &marks); err != nil {
-		return nil, fmt.Errorf("parsing marks: %w", err)
+	var annotations []Annotation
+	if err := json.Unmarshal(data, &annotations); err != nil {
+		return nil, fmt.Errorf("parsing annotations: %w", err)
 	}
-	return marks, nil
+	return annotations, nil
 }

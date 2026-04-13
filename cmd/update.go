@@ -22,7 +22,7 @@ var (
 var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update a card's properties",
-	Long: `Update a bookmark card — star/unstar, mark read/unread, archive,
+	Long: `Update a card — star/unstar, mark read/unread, archive,
 move to a group, or add tags.
 
 Examples:
