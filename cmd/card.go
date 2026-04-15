@@ -112,7 +112,7 @@ func buildCardFilterRequest() (*client.CardFilterRequest, error) {
 	if err != nil {
 		return nil, fmt.Errorf("--start-time: %w", err)
 	}
-	endTime, err := timefmt.Parse(cardEndTime)
+	endTime, err := timefmt.ParseEnd(cardEndTime)
 	if err != nil {
 		return nil, fmt.Errorf("--end-time: %w", err)
 	}

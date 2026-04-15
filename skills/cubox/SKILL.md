@@ -51,7 +51,7 @@ Flags:
 - `--read` / `--unread` — filter by read status
 - `--annotated` — cards with annotations only
 - `--keyword TEXT` — search by keyword
-- `--start-time`, `--end-time` — filter by time (accepts: `today`, `yesterday`, `7d`, `2026-01-01`, `2026-01-01 15:04:05`, or full ISO timestamp)
+- `--start-time`, `--end-time` — filter by time range (see **Time filtering** below)
 - `--limit N` — page size (default 50)
 - `--last-id CARD_ID` — cursor pagination (non-search mode)
 - `--page N` — page-based pagination (search mode, 1-based)
@@ -133,7 +133,7 @@ Flags:
 
 - `--color Yellow,Green,Blue,Pink,Purple` — filter by color
 - `--keyword TEXT` — search annotations
-- `--start-time`, `--end-time` — filter by time (same flexible formats as card list)
+- `--start-time`, `--end-time` — filter by time range (same formats and rules as card list)
 - `--limit N` — page size (default 50)
 - `--last-id ID` — cursor pagination
 - `--all` — auto-paginate all results
@@ -145,6 +145,25 @@ Returns: `[{ "id", "text", "note", "color", "card_id", ... }]`
 Construct clickable Cubox links from any resource ID (card, folder, tag). No API call needed — just the ID + server. **[Must-read: Deep Links](references/deep-links.md)** — URL patterns, scheme rules, and examples.
 
 Default: `https://{server}/web/card/{ID}` — use `cubox://` scheme only when explicitly requested.
+
+## Time filtering
+
+`--start-time` and `--end-time` accept flexible shorthand values. The CLI automatically resolves day-level inputs to the correct boundary:
+
+- `--start-time` resolves to **start of day** (00:00:00.000)
+- `--end-time` resolves to **end of day** (23:59:59.999)
+
+Accepted formats: `today`, `yesterday`, `now`, `7d` (7 days ago), `2026-01-01`, `2026-01-01 15:04:05`, or full ISO timestamp.
+
+Common time query patterns:
+
+| Intent | Command |
+|--------|---------|
+| Today's cards | `--start-time today --end-time today` |
+| Yesterday's cards | `--start-time yesterday --end-time yesterday` |
+| Last 7 days | `--start-time 7d --end-time today` |
+| Since a date | `--start-time 2026-01-01` |
+| Up to now | `--end-time now` |
 
 ## Common Workflows
 

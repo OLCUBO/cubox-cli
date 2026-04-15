@@ -55,7 +55,7 @@ func buildAnnotationFilterRequest() (*client.AnnotationFilterRequest, error) {
 	if err != nil {
 		return nil, fmt.Errorf("--start-time: %w", err)
 	}
-	endTime, err := timefmt.Parse(annotationEndTime)
+	endTime, err := timefmt.ParseEnd(annotationEndTime)
 	if err != nil {
 		return nil, fmt.Errorf("--end-time: %w", err)
 	}
