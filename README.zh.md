@@ -248,22 +248,22 @@ cubox-cli card rag --query "如何构建带认证的 REST API" -o pretty
 ```bash
 # 简单模式 — URL 参数
 cubox-cli save https://example.com
-cubox-cli save https://a.com https://b.com --folder FOLDER_ID
+cubox-cli save https://a.com https://b.com --folder "阅读清单"
 
 # 单个带元数据
 cubox-cli save https://example.com --title "我的页面" --desc "有趣的文章"
 
 # 批量 JSON 输入
-cubox-cli save --json '[{"url":"https://a.com","title":"标题A"},{"url":"https://b.com"}]' --tag TAG_ID1,TAG_ID2
+cubox-cli save --json '[{"url":"https://a.com","title":"标题A"},{"url":"https://b.com"}]' --tag 技术,AI/LLM
 ```
 
-| 参数              | 说明                                                     |
-| --------------- | ------------------------------------------------------ |
-| `--title TEXT`  | 页面标题（单 URL 模式）                                  |
-| `--desc TEXT`   | 页面描述（单 URL 模式）                                  |
-| `--json JSON`   | 批量卡片 JSON 数组 `[{"url","title","description"}]`     |
-| `--folder ID`   | 目标收藏夹 ID                                           |
-| `--tag ID,...`  | 标签 ID（逗号分隔）                                      |
+| 参数               | 说明                                                             |
+| ---------------- | -------------------------------------------------------------- |
+| `--title TEXT`   | 页面标题（单 URL 模式）                                          |
+| `--desc TEXT`    | 页面描述（单 URL 模式）                                          |
+| `--json JSON`    | 批量卡片 JSON 数组 `[{"url","title","description"}]`             |
+| `--folder NAME`  | 目标收藏夹名称（如 `"父级/子级"`）                                |
+| `--tag NAME,...` | 标签名称（逗号分隔，支持嵌套如 `"父级/子级"`）                     |
 
 ### `cubox-cli update`
 
@@ -274,15 +274,15 @@ cubox-cli update --id CARD_ID [flags]
 ```
 
 
-| 参数                     | 说明      |
-| ---------------------- | ------- |
-| `--star` / `--unstar`  | 星标/取消星标 |
-| `--read` / `--unread`  | 已读/未读   |
-| `--archive`            | 归档      |
-| `--folder FOLDER_ID`   | 移动到收藏夹  |
-| `--add-tag TAG_ID,...` | 添加标签    |
-| `--title TEXT`         | 更新标题    |
-| `--description TEXT`   | 更新描述    |
+| 参数                     | 说明                                                      |
+| ---------------------- | ------------------------------------------------------- |
+| `--star` / `--unstar`  | 星标/取消星标                                               |
+| `--read` / `--unread`  | 已读/未读                                                  |
+| `--archive`            | 归档                                                      |
+| `--folder NAME`        | 按名称移动到收藏夹（如 `"父级/子级"`；`""` = 未分类）           |
+| `--tag NAME,...`       | 按名称设置标签（逗号分隔，支持嵌套如 `"父级/子级"`）             |
+| `--title TEXT`         | 更新标题                                                   |
+| `--description TEXT`   | 更新描述                                                   |
 
 
 ### `cubox-cli delete`

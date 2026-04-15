@@ -29,6 +29,9 @@ go.work.sum
 /bin/
 /dist
 
+# OS
+.DS_Store
+
 # env file
 .env
 

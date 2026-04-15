@@ -10,11 +10,11 @@ import (
 )
 
 var (
-	saveFolderID string
-	saveTagIDs  []string
-	saveTitle   string
-	saveDesc    string
-	saveJSON    string
+	saveFolder string
+	saveTags   []string
+	saveTitle  string
+	saveDesc   string
+	saveJSON   string
 )
 
 var saveCmd = &cobra.Command{
@@ -28,26 +28,28 @@ Three input modes:
    cubox-cli save https://example.com https://another.com
 
 2. Single card with metadata:
-   cubox-cli save --url https://example.com --title "Example" --desc "A description"
+   cubox-cli save https://example.com --title "Example" --desc "A description"
 
 3. Batch via JSON (full control):
    cubox-cli save --json '[{"url":"https://a.com","title":"A"},{"url":"https://b.com"}]'
 
-All modes support --folder and --tag flags.
+All modes support --folder and --tag flags. Folders and tags are
+specified by name (including nested paths like "parent/child"),
+not by ID.
 
 Examples:
   cubox-cli save https://example.com
-  cubox-cli save https://a.com https://b.com --folder 7295054384872820655
-  cubox-cli save --url https://example.com --title "My Page" --desc "Interesting read"
-  cubox-cli save --json '[{"url":"https://a.com","title":"Title A"}]' --tag 7247925099053977508`,
+  cubox-cli save https://a.com https://b.com --folder "Reading List"
+  cubox-cli save https://example.com --title "My Page" --desc "Interesting read"
+  cubox-cli save --json '[{"url":"https://a.com","title":"Title A"}]' --tag tech,AI/LLM`,
 	RunE: runSave,
 }
 
 func init() {
-	saveCmd.Flags().StringVar(&saveFolderID, "folder", "", "target folder ID")
-	saveCmd.Flags().StringSliceVar(&saveTagIDs, "tag", nil, "tag IDs to apply (comma-separated)")
-	saveCmd.Flags().StringVar(&saveTitle, "title", "", "title for the saved page (use with --url)")
-	saveCmd.Flags().StringVar(&saveDesc, "desc", "", "description for the saved page (use with --url)")
+	saveCmd.Flags().StringVar(&saveFolder, "folder", "", "target folder name (e.g. \"Reading List\" or \"parent/child\")")
+	saveCmd.Flags().StringSliceVar(&saveTags, "tag", nil, "tag names (comma-separated, supports nested like \"parent/child\")")
+	saveCmd.Flags().StringVar(&saveTitle, "title", "", "title for the saved page (single URL mode)")
+	saveCmd.Flags().StringVar(&saveDesc, "desc", "", "description for the saved page (single URL mode)")
 	saveCmd.Flags().StringVar(&saveJSON, "json", "", `batch card entries as JSON array: [{"url":"...","title":"...","description":"..."}]`)
 
 	rootCmd.AddCommand(saveCmd)
@@ -66,9 +68,9 @@ func runSave(cmd *cobra.Command, args []string) error {
 	c := client.New(cfg.BaseURL(), cfg.Token)
 
 	req := &client.SaveCardsRequest{
-		Cards:    cards,
-		FolderID: saveFolderID,
-		TagIDs:  saveTagIDs,
+		Cards:            cards,
+		FolderNestedName: saveFolder,
+		TagNestedNames:   saveTags,
 	}
 
 	if err := c.SaveCards(req); err != nil {

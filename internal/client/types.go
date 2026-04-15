@@ -104,20 +104,20 @@ type SaveCardEntry struct {
 }
 
 type SaveCardsRequest struct {
-	Cards    []SaveCardEntry `json:"cards"`
-	FolderID string          `json:"folder_id,omitempty"`
-	TagIDs   []string        `json:"tag_ids,omitempty"`
+	Cards            []SaveCardEntry `json:"cards"`
+	FolderNestedName string          `json:"folder_nested_name,omitempty"`
+	TagNestedNames   []string        `json:"tag_nested_names,omitempty"`
 }
 
 type CardUpdateRequest struct {
-	ID          string   `json:"id"`
-	Title       string   `json:"title,omitempty"`
-	Description string   `json:"description,omitempty"`
-	Starred     *bool    `json:"starred,omitempty"`
-	Read        *bool    `json:"read,omitempty"`
-	Archive     *bool    `json:"archive,omitempty"`
-	FolderID    string   `json:"folder_id,omitempty"`
-	AddTagIDs   []string `json:"add_tag_ids,omitempty"`
+	ID               string   `json:"id"`
+	Title            string   `json:"title,omitempty"`
+	Description      string   `json:"description,omitempty"`
+	Starred          *bool    `json:"starred,omitempty"`
+	Read             *bool    `json:"read,omitempty"`
+	Archive          *bool    `json:"archive,omitempty"`
+	FolderNestedName *string  `json:"folder_nested_name,omitempty"`
+	TagNestedNames   []string `json:"tag_nested_names,omitempty"`
 }
 
 type RagQueryRequest struct {

@@ -87,7 +87,7 @@ func (c *Client) doRequest(req *http.Request) (json.RawMessage, error) {
 }
 
 func (c *Client) ListFolders() ([]Folder, error) {
-	data, err := c.get("/c/api/cli/group/list", nil)
+	data, err := c.get("/c/api/cli/folder/list", nil)
 	if err != nil {
 		return nil, err
 	}

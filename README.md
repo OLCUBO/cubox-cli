@@ -248,22 +248,22 @@ Save one or more web pages as bookmarks. Supports three input modes.
 ```bash
 # Simple — URL arguments
 cubox-cli save https://example.com
-cubox-cli save https://a.com https://b.com --folder FOLDER_ID
+cubox-cli save https://a.com https://b.com --folder "Reading List"
 
 # Single with metadata
 cubox-cli save https://example.com --title "My Page" --desc "Interesting read"
 
 # Batch via JSON
-cubox-cli save --json '[{"url":"https://a.com","title":"Title A"},{"url":"https://b.com"}]' --tag TAG_ID1,TAG_ID2
+cubox-cli save --json '[{"url":"https://a.com","title":"Title A"},{"url":"https://b.com"}]' --tag tech,AI/LLM
 ```
 
-| Flag            | Description                                                         |
-| --------------- | ------------------------------------------------------------------- |
-| `--title TEXT`  | Title for the saved page (single URL mode only)                     |
-| `--desc TEXT`   | Description for the saved page (single URL mode only)               |
-| `--json JSON`   | Batch card entries as JSON array `[{"url","title","description"}]`   |
-| `--folder ID`   | Target folder ID                                                    |
-| `--tag ID,...`  | Tag IDs to apply (comma-separated)                                  |
+| Flag             | Description                                                         |
+| ---------------- | ------------------------------------------------------------------- |
+| `--title TEXT`   | Title for the saved page (single URL mode only)                     |
+| `--desc TEXT`    | Description for the saved page (single URL mode only)               |
+| `--json JSON`    | Batch card entries as JSON array `[{"url","title","description"}]`   |
+| `--folder NAME`  | Target folder by name (e.g. `"parent/child"`)                       |
+| `--tag NAME,...` | Tag names (comma-separated, supports nested like `"parent/child"`)  |
 
 ### `cubox-cli update`
 
@@ -274,15 +274,15 @@ cubox-cli update --id CARD_ID [flags]
 ```
 
 
-| Flag                   | Description            |
-| ---------------------- | ---------------------- |
-| `--star` / `--unstar`  | Toggle star            |
-| `--read` / `--unread`  | Toggle read status     |
-| `--archive`            | Archive the card       |
-| `--folder FOLDER_ID`   | Move to a folder       |
-| `--add-tag TAG_ID,...` | Add tags               |
-| `--title TEXT`         | update title           |
-| `--description TEXT`   | update description     |
+| Flag                   | Description                                                            |
+| ---------------------- | ---------------------------------------------------------------------- |
+| `--star` / `--unstar`  | Toggle star                                                            |
+| `--read` / `--unread`  | Toggle read status                                                     |
+| `--archive`            | Archive the card                                                       |
+| `--folder NAME`        | Move to folder by name (e.g. `"parent/child"`; `""` = Uncategorized)   |
+| `--tag NAME,...`       | Set tags by name (comma-separated, supports nested like `"parent/child"`) |
+| `--title TEXT`         | Update title                                                           |
+| `--description TEXT`   | Update description                                                     |
 
 ### `cubox-cli delete`
 

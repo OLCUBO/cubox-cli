@@ -85,8 +85,8 @@ Returns: `[{ "id", "title", "description", "domain", "tags", "folder", "url", ..
 ### Save Web Pages
 
 ```bash
-cubox-cli save URL [URL...] [--title TEXT] [--desc TEXT] [--folder FOLDER_ID] [--tag TAG_ID,...]
-cubox-cli save --json '[{"url":"...","title":"...","description":"..."}]' [--folder FOLDER_ID] [--tag TAG_ID,...]
+cubox-cli save URL [URL...] [--title TEXT] [--desc TEXT] [--folder NAME] [--tag NAME,...]
+cubox-cli save --json '[{"url":"...","title":"...","description":"..."}]' [--folder NAME] [--tag NAME,...]
 ```
 
 Save one or more web pages as bookmarks. Three input modes:
@@ -94,6 +94,8 @@ Save one or more web pages as bookmarks. Three input modes:
 - **URL arguments** — simple: `cubox-cli save https://example.com https://b.com`
 - **Single with metadata** — `cubox-cli save https://example.com --title "My Page" --desc "A description"`
 - **Batch via JSON** — `cubox-cli save --json '[{"url":"https://a.com","title":"Title A"}]'`
+
+Folders and tags are specified **by name** (not ID), including nested paths like `"parent/child"`.
 
 ### Update a Card
 
@@ -106,10 +108,12 @@ Flags:
 - `--star` / `--unstar` — toggle star
 - `--read` / `--unread` — toggle read status
 - `--archive` — archive the card
-- `--folder FOLDER_ID` — move to a folder
-- `--add-tag TAG_ID,...` — add tags
-- `--title TEXT` - update title
-- `--description TEXT` - update description
+- `--folder NAME` — move to folder by name (e.g. `"parent/child"`; `""` = Uncategorized)
+- `--tag NAME,...` — set tags by name (comma-separated, supports nested like `"parent/child"`)
+- `--title TEXT` — update title
+- `--description TEXT` — update description
+
+Folders and tags are specified **by name** (not ID). No need to query IDs first.
 
 ### Delete Cards
 
@@ -161,7 +165,7 @@ cubox-cli card list --keyword "machine learning" --page 1
 ### Save a page and star it
 
 ```bash
-cubox-cli save https://example.com --title "Example" --folder FOLDER_ID
+cubox-cli save https://example.com --title "Example" --folder "Reading List"
 cubox-cli update --id CARD_ID --star
 ```
 
