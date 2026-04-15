@@ -120,6 +120,12 @@ Flags:
 
 Returns: `[{ "id", "text", "note", "color", "card_id", ... }]`
 
+### Cubox Deep Links
+
+Construct clickable Cubox links from any resource ID (card, folder, tag). No API call needed — just the ID + server. [**Must-read: Deep Links**](references/deep-links.md) — URL patterns, scheme rules, and examples.
+
+Default: `https://{server}/web/card/{ID}` — use `cubox://` scheme only when explicitly requested.
+
 ## Common Workflows
 
 ### Browse and read a card detail
@@ -141,6 +147,15 @@ cubox-cli card list --keyword "machine learning" --page 1
 ```bash
 cubox-cli save https://example.com --group GROUP_ID
 cubox-cli update --id CARD_ID --star
+```
+
+### List cards with Cubox links
+
+```bash
+cubox-cli auth status          # determine server (cubox.pro or cubox.cc)
+cubox-cli card list --limit 5  # get cards, then append link from ID
+# For card ID 7247925101516031380 on cubox.pro:
+# → https://cubox.pro/web/card/7247925101516031380
 ```
 
 ### Export all annotations
