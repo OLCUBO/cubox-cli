@@ -50,10 +50,10 @@ From the output, for each card with `"id": "7247925101516031380"` on server `cub
 ### List folders with links
 
 ```bash
-cubox-cli group list
+cubox-cli folder list
 ```
 
-For a group with `"id": "7230156249357091393"` on server `cubox.cc`:
+For a folder with `"id": "7230156249357091393"` on server `cubox.cc`:
 
 - HTTPS: `https://cubox.cc/web/folders/7230156249357091393`
 - cubox://: `cubox://folder?id=7230156249357091393`

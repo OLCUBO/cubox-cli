@@ -86,16 +86,16 @@ func (c *Client) doRequest(req *http.Request) (json.RawMessage, error) {
 	return apiResp.Data, nil
 }
 
-func (c *Client) ListGroups() ([]Group, error) {
+func (c *Client) ListFolders() ([]Folder, error) {
 	data, err := c.get("/c/api/cli/group/list", nil)
 	if err != nil {
 		return nil, err
 	}
-	var groups []Group
-	if err := json.Unmarshal(data, &groups); err != nil {
-		return nil, fmt.Errorf("parsing groups: %w", err)
+	var folders []Folder
+	if err := json.Unmarshal(data, &folders); err != nil {
+		return nil, fmt.Errorf("parsing folders: %w", err)
 	}
-	return groups, nil
+	return folders, nil
 }
 
 func (c *Client) ListTags() ([]Tag, error) {

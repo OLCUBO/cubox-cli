@@ -109,7 +109,7 @@ func runLogin(cmd *cobra.Command, args []string) error {
 	}
 
 	c := client.New(cfg.BaseURL(), cfg.Token)
-	if _, err := c.ListGroups(); err != nil {
+	if _, err := c.ListFolders(); err != nil {
 		return fmt.Errorf("login verification failed: %w\nPlease check your token and try again", err)
 	}
 
@@ -136,7 +136,7 @@ func runStatus(cmd *cobra.Command, args []string) error {
 	fmt.Printf("Token:  %s\n", masked)
 
 	c := client.New(cfg.BaseURL(), cfg.Token)
-	if _, err := c.ListGroups(); err != nil {
+	if _, err := c.ListFolders(); err != nil {
 		fmt.Println("Status: connection failed -", err)
 	} else {
 		fmt.Println("Status: connected")

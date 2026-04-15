@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	cardGroupFilter []string
+	cardFolderFilter []string
 	cardTagFilter   []string
 	cardStarred     bool
 	cardRead        bool
@@ -43,7 +43,7 @@ Without --keyword, pagination uses --last-id (cursor-based).
 Examples:
   cubox-cli card list
   cubox-cli card list --starred --limit 10
-  cubox-cli card list --group 7230156249357091393 --all
+  cubox-cli card list --folder 7230156249357091393 --all
   cubox-cli card list --keyword "AI agent" --page 1
   cubox-cli card list --start-time 2026-01-01
   cubox-cli card list --start-time 7d --end-time today`,
@@ -83,7 +83,7 @@ Examples:
 }
 
 func init() {
-	cardListCmd.Flags().StringSliceVar(&cardGroupFilter, "group", nil, "filter by group IDs (comma-separated)")
+	cardListCmd.Flags().StringSliceVar(&cardFolderFilter, "folder", nil, "filter by folder IDs (comma-separated)")
 	cardListCmd.Flags().StringSliceVar(&cardTagFilter, "tag", nil, "filter by tag IDs (comma-separated, empty string = no tag)")
 	cardListCmd.Flags().BoolVar(&cardStarred, "starred", false, "only starred cards")
 	cardListCmd.Flags().BoolVar(&cardRead, "read", false, "only read cards")
@@ -118,7 +118,7 @@ func buildCardFilterRequest() (*client.CardFilterRequest, error) {
 	}
 
 	req := &client.CardFilterRequest{
-		GroupFilters: cardGroupFilter,
+		FolderFilters: cardFolderFilter,
 		TagFilters:   cardTagFilter,
 		Limit:        cardLimit,
 		Keyword:      cardKeyword,

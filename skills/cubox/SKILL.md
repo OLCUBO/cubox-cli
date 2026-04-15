@@ -21,10 +21,10 @@ If any command fails with "not logged in", run `cubox-cli auth login` and follow
 
 All commands output JSON by default. Add `-o pretty` for indented JSON, `-o text` for human-readable output.
 
-### List Groups (Folders)
+### List Folders
 
 ```bash
-cubox-cli group list
+cubox-cli folder list
 ```
 
 Returns: `[{ "id", "nested_name", "name", "parent_id", "uncategorized" }]`
@@ -45,7 +45,7 @@ cubox-cli card list [flags]
 
 Flags:
 
-- `--group ID,...` — filter by group IDs
+- `--folder ID,...` — filter by folder IDs
 - `--tag ID,...` — filter by tag IDs
 - `--starred` — starred cards only
 - `--read` / `--unread` — filter by read status
@@ -62,7 +62,7 @@ Flags:
 - When `--keyword` is set (search mode): use `--page` for pagination, `--last-id` is ignored
 - When `--keyword` is not set (browse mode): use `--last-id` for cursor-based pagination
 
-Returns: `[{ "id", "title", "description", "domain", "read", "starred", "tags", "group", "url", ... }]`
+Returns: `[{ "id", "title", "description", "domain", "read", "starred", "tags", "folder", "url", ... }]`
 
 ### Get Card Detail
 
@@ -80,13 +80,13 @@ cubox-cli card rag --query "QUERY_TEXT"
 
 Semantic search via natural language. Unlike `--keyword`, RAG understands intent and returns conceptually relevant cards. **[Must-read: RAG workflow](references/card-rag-workflow.md)** — covers when to use RAG vs keyword, query refinement, progressive detail fetching, and re-ranking.
 
-Returns: `[{ "id", "title", "description", "domain", "tags", "group", "url", ... }]` (same Card shape as `card list`)
+Returns: `[{ "id", "title", "description", "domain", "tags", "folder", "url", ... }]` (same Card shape as `card list`)
 
 ### Save Web Pages
 
 ```bash
-cubox-cli save URL [URL...] [--title TEXT] [--desc TEXT] [--group GROUP_ID] [--tag TAG_ID,...]
-cubox-cli save --json '[{"url":"...","title":"...","description":"..."}]' [--group GROUP_ID] [--tag TAG_ID,...]
+cubox-cli save URL [URL...] [--title TEXT] [--desc TEXT] [--folder FOLDER_ID] [--tag TAG_ID,...]
+cubox-cli save --json '[{"url":"...","title":"...","description":"..."}]' [--folder FOLDER_ID] [--tag TAG_ID,...]
 ```
 
 Save one or more web pages as bookmarks. Three input modes:
@@ -106,7 +106,7 @@ Flags:
 - `--star` / `--unstar` — toggle star
 - `--read` / `--unread` — toggle read status
 - `--archive` — archive the card
-- `--group GROUP_ID` — move to a group
+- `--folder FOLDER_ID` — move to a folder
 - `--add-tag TAG_ID,...` — add tags
 - `--title TEXT` - update title
 - `--description TEXT` - update description
@@ -147,8 +147,8 @@ Default: `https://{server}/web/card/{ID}` — use `cubox://` scheme only when ex
 ### Browse and read a card detail
 
 ```bash
-cubox-cli group list
-cubox-cli card list --group GROUP_ID --limit 10
+cubox-cli folder list
+cubox-cli card list --folder FOLDER_ID --limit 10
 cubox-cli card detail --id CARD_ID
 ```
 
@@ -161,7 +161,7 @@ cubox-cli card list --keyword "machine learning" --page 1
 ### Save a page and star it
 
 ```bash
-cubox-cli save https://example.com --title "Example" --group GROUP_ID
+cubox-cli save https://example.com --title "Example" --folder FOLDER_ID
 cubox-cli update --id CARD_ID --star
 ```
 
@@ -221,7 +221,7 @@ cubox-cli automatically checks for new versions in the background. When a newer 
 ## Notes
 
 - Browse pagination uses cursor-based approach (`--last-id`). Search pagination uses page numbers (`--page`).
-- The `nested_name` field in groups and tags shows the full hierarchy path (e.g. `"Parent/Child"`).
+- The `nested_name` field in folders and tags shows the full hierarchy path (e.g. `"Parent/Child"`).
 - Card detail includes AI-generated `insight` with summary and Q&A pairs when available.
 - Config is stored at `~/.config/cubox-cli/config.json`.
 

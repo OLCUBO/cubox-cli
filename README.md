@@ -15,13 +15,13 @@ The official Cubox CLI. Save, search, read, and use what you read with AI. Your 
 
 | Category | Capabilities                                                                          |
 | -------- | ------------------------------------------------------------------------------------- |
-| Groups   | List and browse card folders                                                      |
+| Folders  | List and browse card folders                                                      |
 | Tags     | List and browse tag hierarchy                                                         |
-| Cards    | Filter/search cards by group, tag, starred/read/annotated status, keyword, time range |
+| Cards    | Filter/search cards by folder, tag, starred/read/annotated status, keyword, time range |
 | RAG      | Semantic search via natural language query (intent-based retrieval)                    |
 | Content  | Read full card detail with article content (markdown), annotations, and AI insight    |
 | Save     | Save web pages with optional title/description, batch via JSON            |
-| Update   | Star/unstar, mark read/unread, archive, move to group, add tags                       |
+| Update   | Star/unstar, mark read/unread, archive, move to folder, add tags                      |
 | Delete   | Delete cards by ID, with dry-run preview support                             |
 | Annotations | List and search annotations across all cards                                      |
 
@@ -78,7 +78,7 @@ The CLI will guide you through:
 
 ```bash
 # List your folders
-cubox-cli group list
+cubox-cli folder list
 
 # List your tags
 cubox-cli tag list
@@ -131,7 +131,7 @@ cubox-cli auth status
 **Step 4 — Use**
 
 ```bash
-cubox-cli group list
+cubox-cli folder list
 cubox-cli card list --limit 10
 ```
 
@@ -162,13 +162,13 @@ All commands support the `-o` / `--output` flag:
 | `-o text`   | Human-readable text/tree output        |
 
 
-### `cubox-cli group list`
+### `cubox-cli folder list`
 
-List all card groups (folders).
+List all folders.
 
 ```bash
-cubox-cli group list
-cubox-cli group list -o text
+cubox-cli folder list
+cubox-cli folder list -o text
 ```
 
 **JSON output fields:** `id`, `nested_name`, `name`, `parent_id`, `uncategorized`
@@ -195,7 +195,7 @@ cubox-cli card list [flags]
 
 | Flag                | Description                                                        |
 | ------------------- | ------------------------------------------------------------------ |
-| `--group ID,...`    | Filter by group/folder IDs                                         |
+| `--folder ID,...`   | Filter by folder IDs                                               |
 | `--tag ID,...`      | Filter by tag IDs                                                  |
 | `--starred`         | Only starred cards                                                 |
 | `--read`            | Only read cards                                                    |
@@ -248,7 +248,7 @@ Save one or more web pages as bookmarks. Supports three input modes.
 ```bash
 # Simple — URL arguments
 cubox-cli save https://example.com
-cubox-cli save https://a.com https://b.com --group GROUP_ID
+cubox-cli save https://a.com https://b.com --folder FOLDER_ID
 
 # Single with metadata
 cubox-cli save https://example.com --title "My Page" --desc "Interesting read"
@@ -262,7 +262,7 @@ cubox-cli save --json '[{"url":"https://a.com","title":"Title A"},{"url":"https:
 | `--title TEXT`  | Title for the saved page (single URL mode only)                     |
 | `--desc TEXT`   | Description for the saved page (single URL mode only)               |
 | `--json JSON`   | Batch card entries as JSON array `[{"url","title","description"}]`   |
-| `--group ID`    | Target group/folder ID                                              |
+| `--folder ID`   | Target folder ID                                                    |
 | `--tag ID,...`  | Tag IDs to apply (comma-separated)                                  |
 
 ### `cubox-cli update`
@@ -279,7 +279,7 @@ cubox-cli update --id CARD_ID [flags]
 | `--star` / `--unstar`  | Toggle star            |
 | `--read` / `--unread`  | Toggle read status     |
 | `--archive`            | Archive the card       |
-| `--group GROUP_ID`     | Move to a group/folder |
+| `--folder FOLDER_ID`   | Move to a folder       |
 | `--add-tag TAG_ID,...` | Add tags               |
 | `--title TEXT`         | update title           |
 | `--description TEXT`   | update description     |
@@ -346,8 +346,8 @@ cubox-cli card rag --query "articles about building REST APIs with authenticatio
 ### Browse cards in a specific folder
 
 ```bash
-cubox-cli group list -o text
-cubox-cli card list --group 7230156249357091393 --limit 10
+cubox-cli folder list -o text
+cubox-cli card list --folder 7230156249357091393 --limit 10
 ```
 
 ### Read a saved article with AI insight
@@ -411,7 +411,7 @@ cubox-cli/
   cmd/                    # cobra commands
     root.go               # root command, --output flag
     auth.go               # auth login/status/logout
-    group.go              # group list
+    folder.go             # folder list
     tag.go                # tag list
     card.go               # card list, card detail
     save.go               # save web pages

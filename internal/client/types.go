@@ -8,7 +8,7 @@ type APIResponse struct {
 	Data    json.RawMessage `json:"data"`
 }
 
-type Group struct {
+type Folder struct {
 	ID            string  `json:"id"`
 	NestedName    string  `json:"nested_name"`
 	Name          string  `json:"name"`
@@ -44,7 +44,7 @@ type Card struct {
 	Read         bool     `json:"read"`
 	Starred      bool     `json:"starred"`
 	Tags         []string `json:"tags"`
-	Group        *Group   `json:"group,omitempty"`
+	Folder       *Folder  `json:"folder,omitempty"`
 	URL          string   `json:"url"`
 	CreateTime   string   `json:"create_time"`
 	UpdateTime   string   `json:"update_time"`
@@ -73,7 +73,7 @@ type CardDetail struct {
 	Read         bool             `json:"read"`
 	Starred      bool             `json:"starred"`
 	Tags         []string         `json:"tags"`
-	Group        *Group           `json:"group,omitempty"`
+	Folder       *Folder          `json:"folder,omitempty"`
 	URL          string           `json:"url"`
 	CreateTime   string           `json:"create_time"`
 	UpdateTime   string           `json:"update_time"`
@@ -84,7 +84,7 @@ type CardDetail struct {
 }
 
 type CardFilterRequest struct {
-	GroupFilters []string `json:"group_filters,omitempty"`
+	FolderFilters []string `json:"folder_filters,omitempty"`
 	TagFilters   []string `json:"tag_filters,omitempty"`
 	Starred      *bool    `json:"starred,omitempty"`
 	Read         *bool    `json:"read,omitempty"`
@@ -104,9 +104,9 @@ type SaveCardEntry struct {
 }
 
 type SaveCardsRequest struct {
-	Cards   []SaveCardEntry `json:"cards"`
-	GroupID string          `json:"group_id,omitempty"`
-	TagIDs  []string        `json:"tag_ids,omitempty"`
+	Cards    []SaveCardEntry `json:"cards"`
+	FolderID string          `json:"folder_id,omitempty"`
+	TagIDs   []string        `json:"tag_ids,omitempty"`
 }
 
 type CardUpdateRequest struct {
@@ -116,7 +116,7 @@ type CardUpdateRequest struct {
 	Starred     *bool    `json:"starred,omitempty"`
 	Read        *bool    `json:"read,omitempty"`
 	Archive     *bool    `json:"archive,omitempty"`
-	GroupID     string   `json:"group_id,omitempty"`
+	FolderID    string   `json:"folder_id,omitempty"`
 	AddTagIDs   []string `json:"add_tag_ids,omitempty"`
 }
 

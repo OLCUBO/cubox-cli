@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	saveGroupID string
+	saveFolderID string
 	saveTagIDs  []string
 	saveTitle   string
 	saveDesc    string
@@ -33,18 +33,18 @@ Three input modes:
 3. Batch via JSON (full control):
    cubox-cli save --json '[{"url":"https://a.com","title":"A"},{"url":"https://b.com"}]'
 
-All modes support --group and --tag flags.
+All modes support --folder and --tag flags.
 
 Examples:
   cubox-cli save https://example.com
-  cubox-cli save https://a.com https://b.com --group 7295054384872820655
+  cubox-cli save https://a.com https://b.com --folder 7295054384872820655
   cubox-cli save --url https://example.com --title "My Page" --desc "Interesting read"
   cubox-cli save --json '[{"url":"https://a.com","title":"Title A"}]' --tag 7247925099053977508`,
 	RunE: runSave,
 }
 
 func init() {
-	saveCmd.Flags().StringVar(&saveGroupID, "group", "", "target group/folder ID")
+	saveCmd.Flags().StringVar(&saveFolderID, "folder", "", "target folder ID")
 	saveCmd.Flags().StringSliceVar(&saveTagIDs, "tag", nil, "tag IDs to apply (comma-separated)")
 	saveCmd.Flags().StringVar(&saveTitle, "title", "", "title for the saved page (use with --url)")
 	saveCmd.Flags().StringVar(&saveDesc, "desc", "", "description for the saved page (use with --url)")
@@ -66,8 +66,8 @@ func runSave(cmd *cobra.Command, args []string) error {
 	c := client.New(cfg.BaseURL(), cfg.Token)
 
 	req := &client.SaveCardsRequest{
-		Cards:   cards,
-		GroupID: saveGroupID,
+		Cards:    cards,
+		FolderID: saveFolderID,
 		TagIDs:  saveTagIDs,
 	}
 
