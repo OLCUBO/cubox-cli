@@ -267,6 +267,8 @@ cubox-cli update --id CARD_ID [flags]
 | `--archive`            | 归档      |
 | `--group GROUP_ID`     | 移动到收藏夹  |
 | `--add-tag TAG_ID,...` | 添加标签    |
+| `--title TEXT`         | 更新标题    |
+| `--description TEXT`   | 更新描述    |
 
 
 ### `cubox-cli delete`

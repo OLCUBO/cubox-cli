@@ -104,12 +104,14 @@ type SaveURLsRequest struct {
 }
 
 type CardUpdateRequest struct {
-	ID        string   `json:"id"`
-	Starred   *bool    `json:"starred,omitempty"`
-	Read      *bool    `json:"read,omitempty"`
-	Archive   *bool    `json:"archive,omitempty"`
-	GroupID   string   `json:"group_id,omitempty"`
-	AddTagIDs []string `json:"add_tag_ids,omitempty"`
+	ID          string   `json:"id"`
+	Title       string   `json:"title,omitempty"`
+	Description string   `json:"description,omitempty"`
+	Starred     *bool    `json:"starred,omitempty"`
+	Read        *bool    `json:"read,omitempty"`
+	Archive     *bool    `json:"archive,omitempty"`
+	GroupID     string   `json:"group_id,omitempty"`
+	AddTagIDs   []string `json:"add_tag_ids,omitempty"`
 }
 
 type RagQueryRequest struct {

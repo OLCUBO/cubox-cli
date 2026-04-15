@@ -99,6 +99,8 @@ Flags:
 - `--archive` — archive the card
 - `--group GROUP_ID` — move to a group
 - `--add-tag TAG_ID,...` — add tags
+- `--title TEXT` - update title
+- `--description TEXT` - update description
 
 ### Delete Cards
 

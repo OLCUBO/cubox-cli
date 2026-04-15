@@ -267,7 +267,8 @@ cubox-cli update --id CARD_ID [flags]
 | `--archive`            | Archive the card       |
 | `--group GROUP_ID`     | Move to a group/folder |
 | `--add-tag TAG_ID,...` | Add tags               |
-
+| `--title TEXT`         | update title           |
+| `--description TEXT`   | update description     |
 
 ### `cubox-cli delete`
 
