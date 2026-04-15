@@ -12,6 +12,10 @@ metadata:
 
 Manage Cubox bookmarks via the `cubox-cli` command-line tool.
 
+## Authentication
+
+If any command fails with "not logged in", run `cubox-cli auth login` and follow the interactive prompts.
+
 ## Commands
 
 All commands output JSON by default. Add `-o pretty` for indented JSON, `-o text` for human-readable output.

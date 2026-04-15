@@ -68,11 +68,11 @@ cubox-cli auth login
 
 CLI 会引导你完成以下步骤：
 
-1. **选择服务器** — `cubox.pro`（中国）或 `cubox.cc`（国际版）
-2. **获取 API Key** — CLI 会提示打开对应网址：
-  - 中国版：[https://cubox.pro/web/settings/extensions](https://cubox.pro/web/settings/extensions)
-  - 国际版：[https://cubox.cc/web/settings/extensions](https://cubox.cc/web/settings/extensions)
-3. **粘贴 API 链接** — 复制完整链接（如 `https://cubox.pro/c/api/save/abcdefg`）并粘贴。CLI 会自动提取 token。
+1. **登录 Cubox 网页版** — 根据您的 Cubox 所在地区，打开对应的扩展设置页面：
+   - .pro 用户：[https://cubox.pro/web/settings/extensions](https://cubox.pro/web/settings/extensions)
+   - .cc 国际用户：[https://cubox.cc/web/settings/extensions](https://cubox.cc/web/settings/extensions)
+2. **启用 API 扩展** — 在扩展中心页面找到「API 扩展」，启用并复制链接（如 `https://cubox.pro/c/api/save/abcd12345`）。
+3. **粘贴链接** — CLI 会自动提取 token 和服务器信息。
 
 #### 开始使用
 
@@ -106,10 +106,13 @@ npx skills add OLCUBO/cubox-cli -g -y
 
 **步骤 2：认证**
 
-询问用户使用哪个服务器（`cubox.pro` 或 `cubox.cc`），然后引导用户打开扩展设置页面并复制 API 链接：
+引导用户获取 API 链接：
 
-- 中国版：`https://cubox.pro/web/settings/extensions`
-- 国际版：`https://cubox.cc/web/settings/extensions`
+1. 请根据您的 Cubox 所在地区，登录对应的网页版：
+   - .pro 用户：`https://cubox.pro/web/settings/extensions`
+   - .cc 国际用户：`https://cubox.cc/web/settings/extensions`
+2. 在扩展中心页面找到「API 扩展」，启用并复制链接（如 `https://cubox.pro/c/api/save/abcd12345`）。
+3. 将该链接粘贴给我。
 
 用户提供 API 链接或 token 后执行：
 

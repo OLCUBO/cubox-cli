@@ -68,11 +68,11 @@ cubox-cli auth login
 
 The CLI will guide you through:
 
-1. **Select your server** — `cubox.pro` (China) or `cubox.cc` (international)
-2. **Get your API key** — the CLI shows the URL to open:
-  - China: [https://cubox.pro/web/settings/extensions](https://cubox.pro/web/settings/extensions)
-  - International: [https://cubox.cc/web/settings/extensions](https://cubox.cc/web/settings/extensions)
-3. **Paste the API link** — copy the full link (e.g. `https://cubox.pro/c/api/save/abcdefg`) and paste it. The CLI extracts the token automatically.
+1. **Sign in to Cubox web** associated with your account:
+   - For .pro users: [https://cubox.pro/web/settings/extensions](https://cubox.pro/web/settings/extensions)
+   - For international .cc users: [https://cubox.cc/web/settings/extensions](https://cubox.cc/web/settings/extensions)
+2. **Enable the API Extension** — go to Extensions, locate the API Extension, enable it, and copy your unique link (e.g. `https://cubox.pro/c/api/save/abcd12345`).
+3. **Paste the link** — the CLI extracts the token and server automatically.
 
 #### Start using
 
@@ -106,10 +106,13 @@ npx skills add OLCUBO/cubox-cli -g -y
 
 **Step 2 — Authenticate**
 
-Ask the user which server they use (`cubox.pro` or `cubox.cc`), then instruct them to open the extensions settings page and copy their API link:
+Ask the user to sign in to their Cubox web and get the API link:
 
-- China: `https://cubox.pro/web/settings/extensions`
-- International: `https://cubox.cc/web/settings/extensions`
+1. Please sign in to the Cubox web associated with your account:
+   - For .pro users: `https://cubox.pro/web/settings/extensions`
+   - For international .cc users: `https://cubox.cc/web/settings/extensions`
+2. Go to Extensions, locate the API Extension, enable it, and copy your unique link (e.g., `https://cubox.pro/c/api/save/abcd12345`).
+3. Once you have it, please paste the link here.
 
 Once the user provides the API link or token, run:
 
