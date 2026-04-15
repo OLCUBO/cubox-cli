@@ -97,10 +97,16 @@ type CardFilterRequest struct {
 	EndTime      string   `json:"end_time,omitempty"`
 }
 
-type SaveURLsRequest struct {
-	URLs    []string `json:"urls"`
-	GroupID string   `json:"group_id,omitempty"`
-	TagIDs  []string `json:"tag_ids,omitempty"`
+type SaveCardEntry struct {
+	Title       string `json:"title,omitempty"`
+	Description string `json:"description,omitempty"`
+	URL         string `json:"url"`
+}
+
+type SaveCardsRequest struct {
+	Cards   []SaveCardEntry `json:"cards"`
+	GroupID string          `json:"group_id,omitempty"`
+	TagIDs  []string        `json:"tag_ids,omitempty"`
 }
 
 type CardUpdateRequest struct {

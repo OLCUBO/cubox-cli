@@ -20,7 +20,7 @@ The official Cubox CLI. Save, search, read, and use what you read with AI. Your 
 | Cards    | Filter/search cards by group, tag, starred/read/annotated status, keyword, time range |
 | RAG      | Semantic search via natural language query (intent-based retrieval)                    |
 | Content  | Read full card detail with article content (markdown), annotations, and AI insight    |
-| Save     | Save web page URLs                                                       |
+| Save     | Save web pages with optional title/description, batch via JSON            |
 | Update   | Star/unstar, mark read/unread, archive, move to group, add tags                       |
 | Delete   | Delete cards by ID, with dry-run preview support                             |
 | Annotations | List and search annotations across all cards                                      |
@@ -243,13 +243,27 @@ cubox-cli card rag --query "how to build a REST API with authentication" -o pret
 
 ### `cubox-cli save`
 
-Save one or more web page URLs.
+Save one or more web pages as bookmarks. Supports three input modes.
 
 ```bash
+# Simple — URL arguments
 cubox-cli save https://example.com
 cubox-cli save https://a.com https://b.com --group GROUP_ID
-cubox-cli save https://example.com --tag TAG_ID1,TAG_ID2
+
+# Single with metadata
+cubox-cli save https://example.com --title "My Page" --desc "Interesting read"
+
+# Batch via JSON
+cubox-cli save --json '[{"url":"https://a.com","title":"Title A"},{"url":"https://b.com"}]' --tag TAG_ID1,TAG_ID2
 ```
+
+| Flag            | Description                                                         |
+| --------------- | ------------------------------------------------------------------- |
+| `--title TEXT`  | Title for the saved page (single URL mode only)                     |
+| `--desc TEXT`   | Description for the saved page (single URL mode only)               |
+| `--json JSON`   | Batch card entries as JSON array `[{"url","title","description"}]`   |
+| `--group ID`    | Target group/folder ID                                              |
+| `--tag ID,...`  | Tag IDs to apply (comma-separated)                                  |
 
 ### `cubox-cli update`
 
@@ -342,10 +356,10 @@ cubox-cli card list --group 7230156249357091393 --limit 10
 cubox-cli card detail --id 7247925101516031380 -o pretty
 ```
 
-### Save a URL and star it
+### Save a page and star it
 
 ```bash
-cubox-cli save https://example.com
+cubox-cli save https://example.com --title "Example Site"
 cubox-cli update --id CARD_ID --star --read
 ```
 
@@ -400,7 +414,7 @@ cubox-cli/
     group.go              # group list
     tag.go                # tag list
     card.go               # card list, card detail
-    save.go               # save URLs
+    save.go               # save web pages
     update.go             # update card
     delete.go             # delete cards (with dry-run)
     annotation.go         # annotation list

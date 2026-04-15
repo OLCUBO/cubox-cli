@@ -134,8 +134,8 @@ func (c *Client) GetCardDetail(id string) (*CardDetail, error) {
 	return &detail, nil
 }
 
-func (c *Client) SaveURLs(req *SaveURLsRequest) error {
-	_, err := c.post("/c/api/cli/card/save/urls", req)
+func (c *Client) SaveCards(req *SaveCardsRequest) error {
+	_, err := c.post("/c/api/cli/cards/save", req)
 	return err
 }
 

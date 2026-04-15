@@ -1,4 +1,5 @@
 ---
+
 name: cubox
 version: 1.0.0
 description: "Cubox CLI is a callable personal reading memory system that enables you to search, read, and use saved content, perform semantic (RAG-based) queries, access articles, highlights, and metadata, save URLs, update content states, and retrieve annotations and structure such as folders and tags. Use this tool when a task depends on the user’s reading history or requires context from their Cubox library."
@@ -43,6 +44,7 @@ cubox-cli card list [flags]
 ```
 
 Flags:
+
 - `--group ID,...` — filter by group IDs
 - `--tag ID,...` — filter by tag IDs
 - `--starred` — starred cards only
@@ -56,6 +58,7 @@ Flags:
 - `--all` — auto-paginate all results
 
 **Pagination rules:**
+
 - When `--keyword` is set (search mode): use `--page` for pagination, `--last-id` is ignored
 - When `--keyword` is not set (browse mode): use `--last-id` for cursor-based pagination
 
@@ -75,17 +78,22 @@ Returns full card with `content` (markdown), `author`, `annotations`, and `insig
 cubox-cli card rag --query "QUERY_TEXT"
 ```
 
-Semantic search via natural language. Unlike `--keyword`, RAG understands intent and returns conceptually relevant cards. [**Must-read: RAG workflow**](references/card-rag-workflow.md) — covers when to use RAG vs keyword, query refinement, progressive detail fetching, and re-ranking.
+Semantic search via natural language. Unlike `--keyword`, RAG understands intent and returns conceptually relevant cards. **[Must-read: RAG workflow](references/card-rag-workflow.md)** — covers when to use RAG vs keyword, query refinement, progressive detail fetching, and re-ranking.
 
 Returns: `[{ "id", "title", "description", "domain", "tags", "group", "url", ... }]` (same Card shape as `card list`)
 
-### Save URLs
+### Save Web Pages
 
 ```bash
-cubox-cli save URL [URL...] [--group GROUP_ID] [--tag TAG_ID,...]
+cubox-cli save URL [URL...] [--title TEXT] [--desc TEXT] [--group GROUP_ID] [--tag TAG_ID,...]
+cubox-cli save --json '[{"url":"...","title":"...","description":"..."}]' [--group GROUP_ID] [--tag TAG_ID,...]
 ```
 
-Save one or more web page URLs as bookmarks.
+Save one or more web pages as bookmarks. Three input modes:
+
+- **URL arguments** — simple: `cubox-cli save https://example.com https://b.com`
+- **Single with metadata** — `cubox-cli save https://example.com --title "My Page" --desc "A description"`
+- **Batch via JSON** — `cubox-cli save --json '[{"url":"https://a.com","title":"Title A"}]'`
 
 ### Update a Card
 
@@ -94,6 +102,7 @@ cubox-cli update --id CARD_ID [flags]
 ```
 
 Flags:
+
 - `--star` / `--unstar` — toggle star
 - `--read` / `--unread` — toggle read status
 - `--archive` — archive the card
@@ -108,7 +117,7 @@ Flags:
 cubox-cli delete --id CARD_ID [--id ID2,...] [--dry-run]
 ```
 
-Delete cards by ID. **Always `--dry-run` first.** [**Must-read: Dry Run Policy**](references/card-delete.md) — agents must preview before deleting.
+Delete cards by ID. **Always `--dry-run` first.** **[Must-read: Dry Run Policy](references/card-delete.md)** — agents must preview before deleting.
 
 ### List Annotations
 
@@ -117,6 +126,7 @@ cubox-cli annotation list [flags]
 ```
 
 Flags:
+
 - `--color Yellow,Green,Blue,Pink,Purple` — filter by color
 - `--keyword TEXT` — search annotations
 - `--start-time`, `--end-time` — filter by time (same flexible formats as card list)
@@ -128,7 +138,7 @@ Returns: `[{ "id", "text", "note", "color", "card_id", ... }]`
 
 ### Cubox Deep Links
 
-Construct clickable Cubox links from any resource ID (card, folder, tag). No API call needed — just the ID + server. [**Must-read: Deep Links**](references/deep-links.md) — URL patterns, scheme rules, and examples.
+Construct clickable Cubox links from any resource ID (card, folder, tag). No API call needed — just the ID + server. **[Must-read: Deep Links](references/deep-links.md)** — URL patterns, scheme rules, and examples.
 
 Default: `https://{server}/web/card/{ID}` — use `cubox://` scheme only when explicitly requested.
 
@@ -148,10 +158,10 @@ cubox-cli card detail --id CARD_ID
 cubox-cli card list --keyword "machine learning" --page 1
 ```
 
-### Save a URL and star it
+### Save a page and star it
 
 ```bash
-cubox-cli save https://example.com --group GROUP_ID
+cubox-cli save https://example.com --title "Example" --group GROUP_ID
 cubox-cli update --id CARD_ID --star
 ```
 
@@ -192,9 +202,9 @@ cubox-cli automatically checks for new versions in the background. When a newer 
 
 1. Tell the user the current and latest version numbers
 2. Propose running the update (CLI and Skills must be updated together):
-   ```bash
+  ```bash
    npm update -g cubox-cli && npx skills add OLCUBO/cubox-cli -g -y
-   ```
+  ```
 3. After the update, remind the user: **exit and reopen the AI Agent** to load the latest Skills
 
 **Rule**: Do not silently ignore update notices. Even if the current task is unrelated, mention the available update after completing the user's request.
@@ -214,3 +224,4 @@ cubox-cli automatically checks for new versions in the background. When a newer 
 - The `nested_name` field in groups and tags shows the full hierarchy path (e.g. `"Parent/Child"`).
 - Card detail includes AI-generated `insight` with summary and Q&A pairs when available.
 - Config is stored at `~/.config/cubox-cli/config.json`.
+

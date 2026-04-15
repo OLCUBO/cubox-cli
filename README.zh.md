@@ -20,7 +20,7 @@ Cubox 官方 CLI。收藏、搜索、阅读，并借助 AI 使用你读过的内
 | 卡片  | 按收藏夹、标签、星标/已读/标注状态、关键词、时间范围过滤和搜索卡片 |
 | RAG  | 自然语言语义搜索（基于意图的智能检索）                 |
 | 详情  | 查看卡片全文（Markdown）、标注、AI 洞察（摘要 + 问答） |
-| 保存  | 保存文章或网页链接                          |
+| 保存  | 保存网页，支持标题/描述，批量 JSON 输入            |
 | 更新  | 星标/取消星标、已读/未读、归档、移动收藏夹、添加标签        |
 | 删除  | 按 ID 删除收藏卡片，支持 dry-run 预览          |
 | 标注  | 列出和搜索所有卡片的标注，包含高亮和高亮笔记                     |
@@ -243,13 +243,27 @@ cubox-cli card rag --query "如何构建带认证的 REST API" -o pretty
 
 ### `cubox-cli save`
 
-保存一个或多个网页链接。
+保存一个或多个网页为书签。支持三种输入方式。
 
 ```bash
+# 简单模式 — URL 参数
 cubox-cli save https://example.com
 cubox-cli save https://a.com https://b.com --group GROUP_ID
-cubox-cli save https://example.com --tag TAG_ID1,TAG_ID2
+
+# 单个带元数据
+cubox-cli save https://example.com --title "我的页面" --desc "有趣的文章"
+
+# 批量 JSON 输入
+cubox-cli save --json '[{"url":"https://a.com","title":"标题A"},{"url":"https://b.com"}]' --tag TAG_ID1,TAG_ID2
 ```
+
+| 参数              | 说明                                                     |
+| --------------- | ------------------------------------------------------ |
+| `--title TEXT`  | 页面标题（单 URL 模式）                                  |
+| `--desc TEXT`   | 页面描述（单 URL 模式）                                  |
+| `--json JSON`   | 批量卡片 JSON 数组 `[{"url","title","description"}]`     |
+| `--group ID`    | 目标收藏夹 ID                                           |
+| `--tag ID,...`  | 标签 ID（逗号分隔）                                      |
 
 ### `cubox-cli update`
 
@@ -346,7 +360,7 @@ cubox-cli card detail --id 7247925101516031380 -o pretty
 ### 保存链接并加星标
 
 ```bash
-cubox-cli save https://example.com
+cubox-cli save https://example.com --title "示例网站"
 cubox-cli update --id CARD_ID --star --read
 ```
 
@@ -401,7 +415,7 @@ cubox-cli/
     group.go              # group list
     tag.go                # tag list
     card.go               # card list, card detail
-    save.go               # save 保存链接
+    save.go               # save 保存网页
     update.go             # update 更新卡片
     delete.go             # delete 删除卡片（支持 dry-run）
     annotation.go         # annotation 标注列表
