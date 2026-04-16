@@ -33,8 +33,12 @@ automation with structured JSON output.`,
 	},
 
 	// After each command, collect the update result (non-blocking) and emit
-	// a notice if a newer version is available.
+	// a notice to stderr when using text output. JSON/pretty modes are
+	// handled by printJSON, which reads updateCh directly during Run.
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		if outputFormat != "text" {
+			return
+		}
 		var info *update.Info
 		select {
 		case info = <-updateCh:
@@ -43,18 +47,10 @@ automation with structured JSON output.`,
 		if info == nil {
 			return
 		}
-		if outputFormat == "text" {
-			fmt.Fprintf(os.Stderr, "\nUpdate available: %s -> %s\nRun: %s\n",
-				info.Current, info.Latest, info.Command)
-		}
-		// In JSON modes the notice is injected by printJSON; store it for use there.
-		pendingUpdate = info
+		fmt.Fprintf(os.Stderr, "\nUpdate available: %s -> %s\nRun: %s\n",
+			info.Current, info.Latest, info.Command)
 	},
 }
-
-// pendingUpdate is set by PersistentPostRun for the JSON printer to consume.
-// It is only accessed from the main goroutine (cobra runs hooks sequentially).
-var pendingUpdate *update.Info
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "json", "output format: json, pretty, text")
@@ -64,19 +60,23 @@ func Execute() error {
 	return rootCmd.Execute()
 }
 
-// printJSON serialises v as the command output. When a newer version has been
-// detected, the payload is wrapped in {"data":...,"_notice":{"update":...}}.
-// Without a pending update the raw value is printed directly (no wrapper),
-// preserving backward compatibility for callers that parse the output.
+// printJSON serialises v as the command output. It performs a non-blocking
+// read on updateCh; when a newer version is available the payload is wrapped
+// in {"data":...,"_notice":{"update":...}}. Without an update the raw value
+// is printed directly, preserving backward compatibility.
 func printJSON(v interface{}) {
-	if pendingUpdate != nil {
+	var info *update.Info
+	select {
+	case info = <-updateCh:
+	default:
+	}
+	if info != nil {
 		wrapped := map[string]interface{}{
 			"data": v,
 			"_notice": map[string]interface{}{
-				"update": pendingUpdate,
+				"update": info,
 			},
 		}
-		pendingUpdate = nil // consume so it is only printed once
 		printRaw(wrapped)
 		return
 	}
