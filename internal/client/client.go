@@ -144,6 +144,16 @@ func (c *Client) UpdateCard(req *CardUpdateRequest) error {
 	return err
 }
 
+func (c *Client) AddCardTags(req *CardAddTagsRequest) error {
+	_, err := c.post("/c/api/cli/card/add/tags", req)
+	return err
+}
+
+func (c *Client) RemoveCardTags(req *CardRemoveTagsRequest) error {
+	_, err := c.post("/c/api/cli/card/remove/tags", req)
+	return err
+}
+
 func (c *Client) RagQueryCards(query string) ([]Card, error) {
 	data, err := c.post("/c/api/cli/card/rag/query", &RagQueryRequest{Query: query})
 	if err != nil {

@@ -109,9 +109,19 @@ Flags:
 - `--read` / `--unread` — toggle read status
 - `--archive` — archive the card
 - `--folder NAME` — move to folder by name (e.g. `"parent/child"`; `""` = Uncategorized)
-- `--tag NAME,...` — set tags by name (comma-separated, supports nested like `"parent/child"`)
+- `--tag NAME,...` — **replace** all tags (existing tags are removed and replaced)
+- `--add-tag NAME,...` — **add** tags without affecting existing ones
+- `--remove-tag NAME,...` — **remove** specific tags only
 - `--title TEXT` — update title
 - `--description TEXT` — update description
+
+**Tag operation guide** — choose the right flag based on user intent:
+
+| User says | Flag | Behavior |
+|-----------|------|----------|
+| "刷新/更改/替换/设置 tags" | `--tag` | Replaces all tags (old tags removed) |
+| "添加/新增/加上 tags" | `--add-tag` | Appends tags (existing tags kept) |
+| "删除/移除/去掉 tags" | `--remove-tag` | Removes only specified tags |
 
 Folders and tags are specified **by name** (not ID). No need to query IDs first.
 

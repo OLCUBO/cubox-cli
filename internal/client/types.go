@@ -120,6 +120,16 @@ type CardUpdateRequest struct {
 	TagNestedNames   []string `json:"tag_nested_names,omitempty"`
 }
 
+type CardAddTagsRequest struct {
+	ID               string   `json:"id"`
+	AddTagNestedNames []string `json:"add_tag_nested_names,omitempty"`
+}
+
+type CardRemoveTagsRequest struct {
+	ID                  string   `json:"id"`
+	RemoveTagNestedNames []string `json:"remove_tag_nested_names,omitempty"`
+}
+
 type RagQueryRequest struct {
 	Query string `json:"query"`
 }
