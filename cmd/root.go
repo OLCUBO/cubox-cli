@@ -57,7 +57,20 @@ func init() {
 }
 
 func Execute() error {
-	return rootCmd.Execute()
+	err := rootCmd.Execute()
+	if err != nil {
+		switch outputFormat {
+		case "json":
+			data, _ := json.Marshal(map[string]string{"error": err.Error()})
+			fmt.Fprintln(os.Stderr, string(data))
+		case "pretty":
+			data, _ := json.MarshalIndent(map[string]string{"error": err.Error()}, "", "  ")
+			fmt.Fprintln(os.Stderr, string(data))
+		default:
+			fmt.Fprintln(os.Stderr, "Error:", err)
+		}
+	}
+	return err
 }
 
 // printJSON serialises v as the command output. It performs a non-blocking
