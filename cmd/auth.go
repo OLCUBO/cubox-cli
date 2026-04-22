@@ -19,14 +19,6 @@ var (
 	flagTokenStdin bool
 )
 
-var servers = []struct {
-	Domain string
-	Label  string
-}{
-	{"cubox.pro", "cubox.pro"},
-	{"cubox.cc", "cubox.cc (international)"},
-}
-
 var authCmd = &cobra.Command{
 	Use:   "auth",
 	Short: "Manage authentication",
@@ -85,45 +77,39 @@ func runLogin(cmd *cobra.Command, args []string) error {
 	reader := bufio.NewReader(os.Stdin)
 
 	server := flagServer
-	if server == "" {
-		fmt.Println("? Select Cubox server:")
-		for i, s := range servers {
-			fmt.Printf("  %d. %s\n", i+1, s.Label)
-		}
-		fmt.Print("Enter choice [1]: ")
-		line, _ := reader.ReadString('\n')
-		line = strings.TrimSpace(line)
-		switch line {
-		case "", "1":
-			server = servers[0].Domain
-		case "2":
-			server = servers[1].Domain
-		default:
-			return fmt.Errorf("invalid choice: %s", line)
-		}
-	}
-
-	if server != "cubox.pro" && server != "cubox.cc" {
-		return fmt.Errorf("invalid server %q, must be cubox.pro or cubox.cc", server)
-	}
-
 	var token string
+
 	switch {
 	case flagTokenStdin:
 		data, err := io.ReadAll(os.Stdin)
 		if err != nil {
 			return fmt.Errorf("reading token from stdin: %w", err)
 		}
-		token = extractToken(strings.TrimSpace(strings.SplitN(string(data), "\n", 2)[0]))
+		firstLine := strings.SplitN(strings.TrimSpace(string(data)), "\n", 2)[0]
+		server, token = resolveAPIInput(server, firstLine)
 	case flagToken != "":
-		token = extractToken(flagToken)
+		server, token = resolveAPIInput(server, flagToken)
 	default:
-		extensionsURL := fmt.Sprintf("https://%s/web/settings/extensions", server)
-		fmt.Printf("\nOpen %s\nCopy your API link and paste it here:\n> ", extensionsURL)
+		fmt.Println("Sign in to Cubox and paste your API link below.")
+		fmt.Println()
+		fmt.Println("  1. Please sign in to the Cubox web associated with your account:")
+		fmt.Println("     - For international .cc users: https://cubox.cc/web/settings/extensions")
+		fmt.Println("     - For .pro users:              https://cubox.pro/web/settings/extensions")
+		fmt.Println("  2. Go to Extensions, locate the API Extension, enable it, and copy")
+		fmt.Println("     your unique link (e.g. https://cubox.pro/c/api/save/abcd12345).")
+		fmt.Println("  3. Paste the link here.")
+		fmt.Println()
+		fmt.Print("> ")
 		line, _ := reader.ReadString('\n')
-		token = extractToken(strings.TrimSpace(line))
+		server, token = resolveAPIInput(server, line)
 	}
 
+	if server == "" {
+		return fmt.Errorf("could not determine server. Paste the full API link (e.g. https://cubox.pro/c/api/save/...) or pass --server cubox.pro|cubox.cc")
+	}
+	if server != "cubox.pro" && server != "cubox.cc" {
+		return fmt.Errorf("invalid server %q, must be cubox.pro or cubox.cc", server)
+	}
 	if token == "" {
 		return fmt.Errorf("empty token provided")
 	}
@@ -177,17 +163,26 @@ func runLogout(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func extractToken(input string) string {
-	input = strings.TrimSpace(input)
-	if input == "" {
-		return ""
+// resolveAPIInput interprets raw as either a bare API token or a full API
+// link URL ("https://cubox.pro/c/api/save/abcd"). When raw parses as a URL,
+// its host auto-populates server unless the caller already set one
+// explicitly (for example via --server). Returns the (possibly updated)
+// server and the extracted token.
+func resolveAPIInput(server, raw string) (string, string) {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return server, ""
 	}
-	u, err := url.Parse(input)
-	if err == nil && u.Scheme != "" {
+	if u, err := url.Parse(raw); err == nil && u.Scheme != "" && u.Host != "" {
 		parts := strings.Split(strings.TrimRight(u.Path, "/"), "/")
+		token := ""
 		if len(parts) > 0 {
-			return parts[len(parts)-1]
+			token = parts[len(parts)-1]
 		}
+		if server == "" {
+			server = strings.ToLower(u.Hostname())
+		}
+		return server, token
 	}
-	return input
+	return server, raw
 }
