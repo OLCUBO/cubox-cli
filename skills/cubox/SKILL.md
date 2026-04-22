@@ -1,7 +1,7 @@
 ---
 
 name: cubox
-version: 1.0.0
+version: 1.0.6
 description: "Cubox CLI is a callable personal reading memory system that enables you to search, read, and use saved content, perform semantic (RAG-based) queries, access articles, highlights, and metadata, save URLs, update content states, and retrieve annotations and structure such as folders and tags. Use this tool when a task depends on the user’s reading history or requires context from their Cubox library."
 metadata:
   requires:
