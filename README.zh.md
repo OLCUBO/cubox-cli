@@ -112,15 +112,23 @@ npx skills add OLCUBO/cubox-cli -g -y
    - .pro 用户：`https://cubox.pro/web/settings/extensions`
    - .cc 国际用户：`https://cubox.cc/web/settings/extensions`
 2. 在扩展中心页面找到「API 扩展」，启用并复制链接（如 `https://cubox.pro/c/api/save/abcd12345`）。
-3. 将该链接粘贴给我。
 
-用户提供 API 链接或 token 后执行：
+Agent **不要**让用户把 token 粘贴到对话里，也不要把 token 拼接进命令行 argv。请指引用户自行在终端运行以下任意一种：
 
 ```bash
-cubox-cli auth login --server cubox.pro --token TOKEN
+# 交互式（推荐给人类用户）
+cubox-cli auth login
+
+# Agent / CI 无落盘模式 —— token 仅存在于 shell 环境变量中
+export CUBOX_SERVER=cubox.pro
+export CUBOX_TOKEN=... # 也可以是完整的 API 链接 URL
+cubox-cli folder list
+
+# 非交互式持久登录 —— token 通过 stdin 传入，不进入 argv / ps / history
+printf '%s' "$TOKEN" | cubox-cli auth login --server cubox.pro --token-stdin
 ```
 
-`--token` 参数接受完整的 API 链接 URL 或纯 token 字符串。
+旧式 `--token TOKEN` 参数仍然可用，但会把 token 泄漏到 shell history 和 `ps`，仅建议在受控环境使用。
 
 **步骤 3：验证**
 
@@ -138,15 +146,17 @@ cubox-cli card list --limit 10
 ## 认证
 
 
-| 命令                                                      | 说明                      |
-| ------------------------------------------------------- | ----------------------- |
-| `cubox-cli auth login`                                  | 交互式登录（选择服务器 + 输入 token） |
-| `cubox-cli auth login --server cubox.pro --token TOKEN` | 非交互式登录（适用于 Agent）       |
-| `cubox-cli auth status`                                 | 显示当前服务器、脱敏 token、连接测试   |
-| `cubox-cli auth logout`                                 | 删除已保存的凭证                |
+| 命令                                                                               | 说明                                                  |
+| ------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `cubox-cli auth login`                                                          | 交互式登录（选择服务器 + 输入 token）                             |
+| `printf '%s' "$TOKEN" \| cubox-cli auth login --server cubox.pro --token-stdin` | 从 stdin 读取 token 的非交互式登录（推荐 Agent 使用）                |
+| `CUBOX_SERVER=cubox.pro CUBOX_TOKEN=... cubox-cli ...`                          | 纯环境变量模式，不落盘（推荐 CI / 沙箱场景）                           |
+| `cubox-cli auth login --server cubox.pro --token TOKEN`                         | 旧式 argv 写法，会泄漏到 shell history / ps，尽量避免             |
+| `cubox-cli auth status`                                                         | 显示当前服务器、脱敏 token、连接测试                               |
+| `cubox-cli auth logout`                                                         | 删除已保存的凭证                                            |
 
 
-凭证保存在 `~/.config/cubox-cli/config.json`。
+凭证保存在 `~/.config/cubox-cli/config.json`。设置 `CUBOX_TOKEN` / `CUBOX_SERVER` 环境变量会覆盖配置文件；当配置文件不存在时，单独使用这两个环境变量即可登录。
 
 ## 命令
 

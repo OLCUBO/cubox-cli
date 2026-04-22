@@ -32,7 +32,17 @@ func Path() (string, error) {
 	return filepath.Join(dir, "config.json"), nil
 }
 
+// Load returns the effective configuration. Precedence (highest first):
+//  1. Environment variables CUBOX_TOKEN / CUBOX_SERVER override individual
+//     fields read from disk.
+//  2. If the on-disk config is missing but both CUBOX_TOKEN and CUBOX_SERVER
+//     are set, a transient Config is returned without touching disk. This
+//     lets Agents/CI run without persisting the token.
+//  3. Otherwise the on-disk config is used as-is.
 func Load() (*Config, error) {
+	envToken := os.Getenv("CUBOX_TOKEN")
+	envServer := os.Getenv("CUBOX_SERVER")
+
 	p, err := Path()
 	if err != nil {
 		return nil, err
@@ -40,13 +50,22 @@ func Load() (*Config, error) {
 	data, err := os.ReadFile(p)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("not logged in. Run `cubox-cli auth login` first")
+			if envToken != "" && envServer != "" {
+				return &Config{Server: envServer, Token: envToken}, nil
+			}
+			return nil, fmt.Errorf("not logged in. Run `cubox-cli auth login` first, or set CUBOX_TOKEN and CUBOX_SERVER environment variables")
 		}
 		return nil, fmt.Errorf("reading config: %w", err)
 	}
 	var cfg Config
 	if err := json.Unmarshal(data, &cfg); err != nil {
 		return nil, fmt.Errorf("parsing config: %w", err)
+	}
+	if envToken != "" {
+		cfg.Token = envToken
+	}
+	if envServer != "" {
+		cfg.Server = envServer
 	}
 	if cfg.Server == "" || cfg.Token == "" {
 		return nil, fmt.Errorf("incomplete config. Run `cubox-cli auth login` to reconfigure")

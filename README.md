@@ -112,15 +112,23 @@ Ask the user to sign in to their Cubox web and get the API link:
    - For .pro users: `https://cubox.pro/web/settings/extensions`
    - For international .cc users: `https://cubox.cc/web/settings/extensions`
 2. Go to Extensions, locate the API Extension, enable it, and copy your unique link (e.g., `https://cubox.pro/c/api/save/abcd12345`).
-3. Once you have it, please paste the link here.
 
-Once the user provides the API link or token, run:
+The agent **must not** ask the user to paste the token into chat or embed it into argv. Instead, direct the user to run one of these themselves in their terminal:
 
 ```bash
-cubox-cli auth login --server cubox.pro --token TOKEN
+# Interactive (recommended for humans)
+cubox-cli auth login
+
+# Agent / CI without persistence — token lives only in the shell environment
+export CUBOX_SERVER=cubox.pro
+export CUBOX_TOKEN=... # or the full API link URL
+cubox-cli folder list
+
+# Non-interactive persisted login — token piped via stdin, never in argv/ps/history
+printf '%s' "$TOKEN" | cubox-cli auth login --server cubox.pro --token-stdin
 ```
 
-The `--token` flag accepts either the full API link URL or just the token string.
+The legacy `--token TOKEN` flag still works but exposes the token to shell history and `ps`; only use it in controlled environments.
 
 **Step 3 — Verify**
 
@@ -138,15 +146,17 @@ cubox-cli card list --limit 10
 ## Authentication
 
 
-| Command                                                 | Description                                        |
-| ------------------------------------------------------- | -------------------------------------------------- |
-| `cubox-cli auth login`                                  | Interactive login (server selection + token input) |
-| `cubox-cli auth login --server cubox.pro --token TOKEN` | Non-interactive login (for agents)                 |
-| `cubox-cli auth status`                                 | Show current server, masked token, connection test |
-| `cubox-cli auth logout`                                 | Remove saved credentials                           |
+| Command                                                              | Description                                                              |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `cubox-cli auth login`                                               | Interactive login (server selection + token input)                       |
+| `printf '%s' "$TOKEN" \| cubox-cli auth login --server cubox.pro --token-stdin` | Non-interactive login via stdin (recommended for agents)       |
+| `CUBOX_SERVER=cubox.pro CUBOX_TOKEN=... cubox-cli ...`               | Transient env-var auth (no file written; recommended for CI / sandboxes) |
+| `cubox-cli auth login --server cubox.pro --token TOKEN`              | Legacy argv form — leaks to shell history/ps, avoid when possible        |
+| `cubox-cli auth status`                                              | Show current server, masked token, connection test                       |
+| `cubox-cli auth logout`                                              | Remove saved credentials                                                 |
 
 
-Credentials are stored at `~/.config/cubox-cli/config.json`.
+Credentials are stored at `~/.config/cubox-cli/config.json`. `CUBOX_TOKEN` and `CUBOX_SERVER` override the on-disk config when set, and are enough on their own when no config file exists.
 
 ## Commands
 

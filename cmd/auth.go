@@ -3,6 +3,7 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"net/url"
 	"os"
 	"strings"
@@ -13,8 +14,9 @@ import (
 )
 
 var (
-	flagServer string
-	flagToken  string
+	flagServer     string
+	flagToken      string
+	flagTokenStdin bool
 )
 
 var servers = []struct {
@@ -38,8 +40,19 @@ var loginCmd = &cobra.Command{
 Interactive mode (for humans):
   cubox-cli auth login
 
-Non-interactive mode (for AI agents):
-  cubox-cli auth login --server cubox.pro --token YOUR_TOKEN`,
+Non-interactive modes (recommended for Agents / CI):
+
+  # Preferred: transient environment variables (no token is persisted on disk)
+  export CUBOX_SERVER=cubox.pro
+  export CUBOX_TOKEN=...
+  cubox-cli folder list
+
+  # Persisted login, token piped via stdin (keeps it out of argv/ps/history)
+  printf '%s' "$TOKEN" | cubox-cli auth login --server cubox.pro --token-stdin
+
+The --token flag is still accepted for backwards compatibility, but note that
+passing a token on the command line exposes it to shell history and the
+process list; prefer CUBOX_TOKEN or --token-stdin in automated environments.`,
 	RunE: runLogin,
 }
 
@@ -57,13 +70,18 @@ var logoutCmd = &cobra.Command{
 
 func init() {
 	loginCmd.Flags().StringVar(&flagServer, "server", "", "server domain: cubox.pro or cubox.cc")
-	loginCmd.Flags().StringVar(&flagToken, "token", "", "API token (last segment of your API link)")
+	loginCmd.Flags().StringVar(&flagToken, "token", "", "API token on argv (leaks to shell history/ps; prefer CUBOX_TOKEN or --token-stdin)")
+	loginCmd.Flags().BoolVar(&flagTokenStdin, "token-stdin", false, "read API token from stdin (first line)")
 
 	authCmd.AddCommand(loginCmd, statusCmd, logoutCmd)
 	rootCmd.AddCommand(authCmd)
 }
 
 func runLogin(cmd *cobra.Command, args []string) error {
+	if flagTokenStdin && flagToken != "" {
+		return fmt.Errorf("--token and --token-stdin are mutually exclusive")
+	}
+
 	reader := bufio.NewReader(os.Stdin)
 
 	server := flagServer
@@ -89,14 +107,21 @@ func runLogin(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("invalid server %q, must be cubox.pro or cubox.cc", server)
 	}
 
-	token := flagToken
-	if token == "" {
+	var token string
+	switch {
+	case flagTokenStdin:
+		data, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			return fmt.Errorf("reading token from stdin: %w", err)
+		}
+		token = extractToken(strings.TrimSpace(strings.SplitN(string(data), "\n", 2)[0]))
+	case flagToken != "":
+		token = extractToken(flagToken)
+	default:
 		extensionsURL := fmt.Sprintf("https://%s/web/settings/extensions", server)
 		fmt.Printf("\nOpen %s\nCopy your API link and paste it here:\n> ", extensionsURL)
 		line, _ := reader.ReadString('\n')
 		token = extractToken(strings.TrimSpace(line))
-	} else {
-		token = extractToken(token)
 	}
 
 	if token == "" {
