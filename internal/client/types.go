@@ -89,6 +89,7 @@ type CardFilterRequest struct {
 	Starred      *bool    `json:"starred,omitempty"`
 	Read         *bool    `json:"read,omitempty"`
 	Annotated    *bool    `json:"annotated,omitempty"`
+	Archived     *bool    `json:"archived,omitempty"`
 	LastCardID   string   `json:"last_card_id,omitempty"`
 	Limit        int      `json:"limit,omitempty"`
 	Keyword      string   `json:"keyword,omitempty"`
@@ -115,9 +116,13 @@ type CardUpdateRequest struct {
 	Description      string   `json:"description,omitempty"`
 	Starred          *bool    `json:"starred,omitempty"`
 	Read             *bool    `json:"read,omitempty"`
-	Archive          *bool    `json:"archive,omitempty"`
 	FolderNestedName *string  `json:"folder_nested_name,omitempty"`
 	TagNestedNames   []string `json:"tag_nested_names,omitempty"`
+}
+
+type MoveCardsRequest struct {
+	FolderID string   `json:"folder_id"`
+	CardIDs  []string `json:"card_ids"`
 }
 
 type CardAddTagsRequest struct {

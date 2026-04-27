@@ -17,6 +17,7 @@ var (
 	cardRead        bool
 	cardUnread      bool
 	cardAnnotated   bool
+	cardArchived    bool
 	cardLimit       int
 	cardLastID      string
 	cardAll         bool
@@ -37,6 +38,9 @@ var cardListCmd = &cobra.Command{
 	Short: "List and filter cards",
 	Long: `Filter and list cards. Supports keyword search.
 
+By default only non-archived cards are returned. Use --archived to
+list archived cards instead.
+
 When using --keyword for search, pagination uses --page (1-based).
 Without --keyword, pagination uses --last-id (cursor-based).
 
@@ -44,6 +48,7 @@ Examples:
   cubox-cli card list
   cubox-cli card list --starred --limit 10
   cubox-cli card list --folder 7230156249357091393 --all
+  cubox-cli card list --archived --limit 10
   cubox-cli card list --keyword "AI agent" --page 1
   cubox-cli card list --start-time 2026-01-01
   cubox-cli card list --start-time 7d --end-time today`,
@@ -89,6 +94,7 @@ func init() {
 	cardListCmd.Flags().BoolVar(&cardRead, "read", false, "only read cards")
 	cardListCmd.Flags().BoolVar(&cardUnread, "unread", false, "only unread cards")
 	cardListCmd.Flags().BoolVar(&cardAnnotated, "annotated", false, "only annotated cards")
+	cardListCmd.Flags().BoolVar(&cardArchived, "archived", false, "only archived cards (default: only non-archived)")
 	cardListCmd.Flags().IntVar(&cardLimit, "limit", 50, "page size")
 	cardListCmd.Flags().StringVar(&cardLastID, "last-id", "", "last card ID for cursor pagination (non-search)")
 	cardListCmd.Flags().BoolVar(&cardAll, "all", false, "auto-paginate to fetch all results")
@@ -141,6 +147,10 @@ func buildCardFilterRequest() (*client.CardFilterRequest, error) {
 	if cardAnnotated {
 		v := true
 		req.Annotated = &v
+	}
+	if cardArchived {
+		v := true
+		req.Archived = &v
 	}
 
 	if cardKeyword != "" {

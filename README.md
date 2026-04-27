@@ -17,11 +17,12 @@ The official Cubox CLI. Save, search, read, and use what you read with AI. Your 
 | -------- | ------------------------------------------------------------------------------------- |
 | Folders  | List and browse card folders                                                      |
 | Tags     | List and browse tag hierarchy                                                         |
-| Cards    | Filter/search cards by folder, tag, starred/read/annotated status, keyword, time range |
+| Cards    | Filter/search cards by folder, tag, starred/read/annotated/archived status, keyword, time range |
 | RAG      | Semantic search via natural language query (intent-based retrieval)                    |
 | Content  | Read full card detail with article content (markdown), annotations, and AI insight    |
 | Save     | Save web pages with optional title/description, batch via JSON            |
-| Update   | Star/unstar, mark read/unread, archive, move to folder, add tags                      |
+| Update   | Star/unstar, mark read/unread, move to folder, manage tags                            |
+| Archive  | Batch archive cards or restore (unarchive) them into a folder                         |
 | Delete   | Delete cards by ID, with dry-run preview support                             |
 | Annotations | List and search annotations across all cards                                      |
 
@@ -211,6 +212,7 @@ cubox-cli card list [flags]
 | `--read`            | Only read cards                                                    |
 | `--unread`          | Only unread cards                                                  |
 | `--annotated`       | Only cards with annotations                                        |
+| `--archived`        | Only archived cards (default: non-archived only)                   |
 | `--keyword TEXT`    | Search by keyword                                                  |
 | `--start-time TIME` | Filter by create time start (e.g. `2026-01-01T00:00:00:000+08:00`) |
 | `--end-time TIME`   | Filter by create time end                                          |
@@ -288,11 +290,41 @@ cubox-cli update --id CARD_ID [flags]
 | ---------------------- | ---------------------------------------------------------------------- |
 | `--star` / `--unstar`  | Toggle star                                                            |
 | `--read` / `--unread`  | Toggle read status                                                     |
-| `--archive`            | Archive the card                                                       |
 | `--folder NAME`        | Move to folder by name (e.g. `"parent/child"`; `""` = Uncategorized)   |
-| `--tag NAME,...`       | Set tags by name (comma-separated, supports nested like `"parent/child"`) |
+| `--tag NAME,...`       | Replace all tags by name (comma-separated, supports nested like `"parent/child"`) |
+| `--add-tag NAME,...`   | Add tags without removing existing ones                                |
+| `--remove-tag NAME,...`| Remove specific tags only                                              |
 | `--title TEXT`         | Update title                                                           |
 | `--description TEXT`   | Update description                                                     |
+
+> Archive / unarchive are batch operations and live in their own commands — see [`cubox-cli archive`](#cubox-cli-archive) below.
+
+### `cubox-cli archive`
+
+Archive one or more cards by ID. Archived cards are hidden from the default `card list` (use `card list --archived` to view them).
+
+```bash
+cubox-cli archive --id CARD_ID[,ID2,...]
+```
+
+| Flag          | Description                                              |
+| ------------- | -------------------------------------------------------- |
+| `--id ID,...` | Card IDs to archive (comma-separated, required)          |
+
+### `cubox-cli unarchive`
+
+Restore one or more archived cards by moving them into a non-archived folder. The destination folder is required.
+
+```bash
+cubox-cli unarchive --id CARD_ID[,ID2,...] --folder NAME
+```
+
+| Flag             | Description                                                                |
+| ---------------- | -------------------------------------------------------------------------- |
+| `--id ID,...`    | Card IDs to unarchive (comma-separated, required)                          |
+| `--folder NAME`  | Destination folder by name (required; `""` = Uncategorized; `"parent/child"` for nested) |
+
+The folder name is resolved client-side via `folder list`; if the name does not match an existing folder the command fails with a helpful error.
 
 ### `cubox-cli delete`
 
@@ -373,6 +405,19 @@ cubox-cli save https://example.com --title "Example Site"
 cubox-cli update --id CARD_ID --star --read
 ```
 
+### Archive cards and list / restore them later
+
+```bash
+# Archive a batch of cards
+cubox-cli archive --id 7444025677600260245,7443973659296793971
+
+# Browse archived cards
+cubox-cli card list --archived --limit 10
+
+# Restore (move back) into a non-archived folder
+cubox-cli unarchive --id 7444025677600260245,7443973659296793971 --folder "Reading List"
+```
+
 ### Delete cards (with dry-run)
 
 ```bash
@@ -426,6 +471,7 @@ cubox-cli/
     card.go               # card list, card detail
     save.go               # save web pages
     update.go             # update card
+    archive.go            # batch archive / unarchive cards
     delete.go             # delete cards (with dry-run)
     annotation.go         # annotation list
     version.go            # version

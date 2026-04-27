@@ -1,13 +1,13 @@
 ---
 
 name: cubox
-version: 1.0.6
+version: 1.0.7
 description: "Cubox CLI is a callable personal reading memory system that enables you to search, read, and use saved content, perform semantic (RAG-based) queries, access articles, highlights, and metadata, save URLs, update content states, and retrieve annotations and structure such as folders and tags. Use this tool when a task depends on the user’s reading history or requires context from their Cubox library."
 metadata:
   requires:
     bins: ["cubox-cli"]
-  cliHelp: "cubox-cli --help"
----
+
+## cliHelp: "cubox-cli --help"
 
 # cubox-cli
 
@@ -21,19 +21,16 @@ Instead, pick one of these safe paths and tell the user to run it themselves in 
 
 1. **Interactive login (default for humans):** `cubox-cli auth login` — the CLI will prompt for the server and token directly in the terminal.
 2. **Agent / CI without persistence:** set environment variables and invoke the CLI, for example:
-
-   ```bash
+  ```bash
    export CUBOX_SERVER=cubox.pro
    export CUBOX_TOKEN=...
    cubox-cli folder list
-   ```
-
+  ```
    The token stays in the process environment and is never written to disk.
 3. **Non-interactive persisted login:** pipe the token via stdin so it never appears in argv, shell history, or the process list:
-
-   ```bash
+  ```bash
    printf '%s' "$TOKEN" | cubox-cli auth login --server cubox.pro --token-stdin
-   ```
+  ```
 
 **Forbidden patterns (do not suggest or execute):**
 
@@ -73,6 +70,7 @@ Flags:
 - `--starred` — starred cards only
 - `--read` / `--unread` — filter by read status
 - `--annotated` — cards with annotations only
+- `--archived` — archived cards only (default: only non-archived)
 - `--keyword TEXT` — search by keyword
 - `--start-time`, `--end-time` — filter by time range (see **Time filtering** below)
 - `--limit N` — page size (default 50)
@@ -84,6 +82,8 @@ Flags:
 
 - When `--keyword` is set (search mode): use `--page` for pagination, `--last-id` is ignored
 - When `--keyword` is not set (browse mode): use `--last-id` for cursor-based pagination
+
+**Archive filter:** by default the API returns only non-archived cards. Pass `--archived` to list archived cards instead. There is no flag for "both at once" — make two calls if you need a combined view.
 
 Returns: `[{ "id", "title", "description", "domain", "read", "starred", "tags", "folder", "url", ... }]`
 
@@ -139,7 +139,6 @@ Flags:
 
 - `--star` / `--unstar` — toggle star
 - `--read` / `--unread` — toggle read status
-- `--archive` — archive the card
 - `--folder NAME` — move to folder by name (e.g. `"parent/child"`; `""` = Uncategorized)
 - `--tag NAME,...` — **replace** all tags (existing tags are removed and replaced)
 - `--add-tag NAME,...` — **add** tags without affecting existing ones
@@ -147,15 +146,48 @@ Flags:
 - `--title TEXT` — update title
 - `--description TEXT` — update description
 
+> Archive / unarchive moved out of `update`. Use the dedicated batch commands `archive` and `unarchive` below.
+
 **Tag operation guide** — choose the right flag based on user intent:
 
-| User says | Flag | Behavior |
-|-----------|------|----------|
-| "刷新/更改/替换/设置 tags" | `--tag` | Replaces all tags (old tags removed) |
-| "添加/新增/加上 tags" | `--add-tag` | Appends tags (existing tags kept) |
-| "删除/移除/去掉 tags" | `--remove-tag` | Removes only specified tags |
+
+| User says          | Flag           | Behavior                             |
+| ------------------ | -------------- | ------------------------------------ |
+| "刷新/更改/替换/设置 tags" | `--tag`        | Replaces all tags (old tags removed) |
+| "添加/新增/加上 tags"    | `--add-tag`    | Appends tags (existing tags kept)    |
+| "删除/移除/去掉 tags"    | `--remove-tag` | Removes only specified tags          |
+
 
 Folders and tags are specified **by name** (not ID). No need to query IDs first.
+
+### Archive / Unarchive Cards (batch)
+
+Archive is a **batch** operation, separate from `update` (which is per-card). Archived cards are excluded from the default `card list` — use `card list --archived` to see them.
+
+```bash
+# Archive one or more cards
+cubox-cli archive --id CARD_ID[,ID2,...]
+
+# Restore (move back) into a non-archived folder — folder is required
+cubox-cli unarchive --id CARD_ID[,ID2,...] --folder NAME
+```
+
+Flags for `archive`:
+
+- `--id ID,...` — card IDs (comma-separated, required)
+
+Flags for `unarchive`:
+
+- `--id ID,...` — card IDs (comma-separated, required)
+- `--folder NAME` — destination folder by name, required (`""` = Uncategorized; nested like `"parent/child"`). Resolved client-side via `folder list`; an unknown name fails with a clear error.
+
+**Agent guidance:**
+
+- When the user says "归档 / archive 这些卡片", call `cubox-cli archive --id ...` (do NOT use `update`).
+- When the user says "取消归档 / unarchive / 恢复 / 移出归档", call `cubox-cli unarchive --id ... --folder NAME`. If they did not specify a destination folder, ask which folder to restore into (suggesting "Uncategorized" with `--folder ""` as the safe default).
+- To list archived cards before acting, run `cubox-cli card list --archived` first.
+
+Returns: `{ "count": N, "message": "Successfully archived/unarchived N card(s)." }`
 
 ### Delete Cards
 
@@ -199,13 +231,15 @@ Accepted formats: `today`, `yesterday`, `now`, `7d` (7 days ago), `2026-01-01`, 
 
 Common time query patterns:
 
-| Intent | Command |
-|--------|---------|
-| Today's cards | `--start-time today --end-time today` |
+
+| Intent            | Command                                       |
+| ----------------- | --------------------------------------------- |
+| Today's cards     | `--start-time today --end-time today`         |
 | Yesterday's cards | `--start-time yesterday --end-time yesterday` |
-| Last 7 days | `--start-time 7d --end-time today` |
-| Since a date | `--start-time 2026-01-01` |
-| Up to now | `--end-time now` |
+| Last 7 days       | `--start-time 7d --end-time today`            |
+| Since a date      | `--start-time 2026-01-01`                     |
+| Up to now         | `--end-time now`                              |
+
 
 ## Common Workflows
 
@@ -273,10 +307,9 @@ cubox-cli automatically checks for new versions in the background. When a newer 
 
 1. Tell the user the current and latest version numbers (from `_notice.update.current` / `.latest`).
 2. Show the hardcoded update command and ask the user whether to run it. CLI and Skills must be updated together:
-
-   ```bash
+  ```bash
    npm update -g cubox-cli && npx skills add OLCUBO/cubox-cli -g -y
-   ```
+  ```
 3. After the user runs the update, remind them: **exit and reopen the AI Agent** to load the latest Skills.
 
 **Rules**:

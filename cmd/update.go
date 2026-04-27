@@ -16,7 +16,6 @@ var (
 	updateUnstar      bool
 	updateRead        bool
 	updateUnread      bool
-	updateArchive     bool
 	updateFolder      string
 	updateTags        []string
 	updateAddTags     []string
@@ -26,8 +25,12 @@ var (
 var updateCmd = &cobra.Command{
 	Use:   "update",
 	Short: "Update a card's properties",
-	Long: `Update a card — star/unstar, mark read/unread, archive,
-move to a folder, manage tags, update title or description.
+	Long: `Update a card — star/unstar, mark read/unread, move to a
+folder, manage tags, update title or description.
+
+For archive/unarchive, use the dedicated batch commands instead:
+  cubox-cli archive --id ID,ID,...
+  cubox-cli unarchive --id ID,ID,... --folder NAME
 
 Tag operations:
   --tag NAME,...        Replace all tags (existing tags are removed)
@@ -54,7 +57,6 @@ func init() {
 	updateCmd.Flags().BoolVar(&updateUnstar, "unstar", false, "unstar the card")
 	updateCmd.Flags().BoolVar(&updateRead, "read", false, "mark as read")
 	updateCmd.Flags().BoolVar(&updateUnread, "unread", false, "mark as unread")
-	updateCmd.Flags().BoolVar(&updateArchive, "archive", false, "archive the card")
 	updateCmd.Flags().StringVar(&updateFolder, "folder", "", "move to folder by name (e.g. \"parent/child\"; \"\" = Uncategorized)")
 	updateCmd.Flags().StringSliceVar(&updateTags, "tag", nil, "replace all tags (comma-separated, supports nested like \"parent/child\")")
 	updateCmd.Flags().StringSliceVar(&updateAddTags, "add-tag", nil, "add tags without removing existing ones (comma-separated)")
@@ -74,7 +76,7 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 
 	needUpdate := len(updateTags) > 0 || cmd.Flags().Changed("folder") ||
 		updateStar || updateUnstar || updateRead || updateUnread ||
-		updateArchive || updateTitle != "" || updateDescription != ""
+		updateTitle != "" || updateDescription != ""
 
 	if needUpdate {
 		req := &client.CardUpdateRequest{
@@ -100,10 +102,6 @@ func runUpdate(cmd *cobra.Command, args []string) error {
 		if updateUnread {
 			v := false
 			req.Read = &v
-		}
-		if updateArchive {
-			v := true
-			req.Archive = &v
 		}
 		if updateTitle != "" {
 			req.Title = updateTitle

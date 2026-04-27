@@ -17,11 +17,12 @@ Cubox 官方 CLI。收藏、搜索、阅读，并借助 AI 使用你读过的内
 | --- | ---------------------------------- |
 | 收藏夹 | 列出和浏览文件夹                         |
 | 标签  | 列出和浏览标签层级                          |
-| 卡片  | 按收藏夹、标签、星标/已读/标注状态、关键词、时间范围过滤和搜索卡片 |
+| 卡片  | 按收藏夹、标签、星标/已读/标注/归档状态、关键词、时间范围过滤和搜索卡片 |
 | RAG  | 自然语言语义搜索（基于意图的智能检索）                 |
 | 详情  | 查看卡片全文（Markdown）、标注、AI 洞察（摘要 + 问答） |
 | 保存  | 保存网页，支持标题/描述，批量 JSON 输入            |
-| 更新  | 星标/取消星标、已读/未读、归档、移动收藏夹、添加标签        |
+| 更新  | 星标/取消星标、已读/未读、移动收藏夹、管理标签              |
+| 归档  | 批量归档收藏卡片，或恢复（取消归档）到指定收藏夹           |
 | 删除  | 按 ID 删除收藏卡片，支持 dry-run 预览          |
 | 标注  | 列出和搜索所有卡片的标注，包含高亮和高亮笔记                     |
 
@@ -211,6 +212,7 @@ cubox-cli card list [flags]
 | `--read`            | 仅已读卡片                                        |
 | `--unread`          | 仅未读卡片                                        |
 | `--annotated`       | 仅有标注的卡片                                      |
+| `--archived`        | 仅归档卡片（默认仅返回未归档卡片）                              |
 | `--keyword TEXT`    | 关键词搜索                                        |
 | `--start-time TIME` | 按收藏开始时间过滤（如 `2026-01-01T00:00:00:000+08:00`） |
 | `--end-time TIME`   | 按收藏结束时间过滤                                    |
@@ -288,12 +290,42 @@ cubox-cli update --id CARD_ID [flags]
 | ---------------------- | ------------------------------------------------------- |
 | `--star` / `--unstar`  | 星标/取消星标                                               |
 | `--read` / `--unread`  | 已读/未读                                                  |
-| `--archive`            | 归档                                                      |
 | `--folder NAME`        | 按名称移动到收藏夹（如 `"父级/子级"`；`""` = 未分类）           |
-| `--tag NAME,...`       | 按名称设置标签（逗号分隔，支持嵌套如 `"父级/子级"`）             |
+| `--tag NAME,...`       | 按名称替换全部标签（逗号分隔，支持嵌套如 `"父级/子级"`）           |
+| `--add-tag NAME,...`   | 在原有标签基础上新增标签                                     |
+| `--remove-tag NAME,...`| 仅移除指定的标签                                             |
 | `--title TEXT`         | 更新标题                                                   |
 | `--description TEXT`   | 更新描述                                                   |
 
+
+> 归档/取消归档为批量操作，已拆分为独立命令——见下方 [`cubox-cli archive`](#cubox-cli-archive)。
+
+### `cubox-cli archive`
+
+按 ID 批量归档收藏卡片。归档后的卡片不会出现在默认的 `card list` 中（使用 `card list --archived` 查看归档列表）。
+
+```bash
+cubox-cli archive --id CARD_ID[,ID2,...]
+```
+
+| 参数            | 说明                              |
+| ------------- | ------------------------------- |
+| `--id ID,...` | 要归档的卡片 ID（逗号分隔，必填）            |
+
+### `cubox-cli unarchive`
+
+通过将归档卡片移动到一个非归档收藏夹，批量恢复归档的收藏卡片。**目标收藏夹为必填**。
+
+```bash
+cubox-cli unarchive --id CARD_ID[,ID2,...] --folder NAME
+```
+
+| 参数              | 说明                                                                  |
+| --------------- | ------------------------------------------------------------------- |
+| `--id ID,...`   | 要恢复的卡片 ID（逗号分隔，必填）                                              |
+| `--folder NAME` | 目标收藏夹名称（必填；`""` 表示未分类；嵌套写法 `"父级/子级"`）                       |
+
+收藏夹名称会先通过 `folder list` 在客户端解析为 `folder_id`；如果名称无法匹配现有收藏夹，命令会以可读错误终止。
 
 ### `cubox-cli delete`
 
@@ -374,6 +406,19 @@ cubox-cli save https://example.com --title "示例网站"
 cubox-cli update --id CARD_ID --star --read
 ```
 
+### 归档与恢复卡片
+
+```bash
+# 批量归档
+cubox-cli archive --id 7444025677600260245,7443973659296793971
+
+# 浏览归档列表
+cubox-cli card list --archived --limit 10
+
+# 批量恢复（移动到非归档收藏夹）
+cubox-cli unarchive --id 7444025677600260245,7443973659296793971 --folder "阅读清单"
+```
+
 ### 删除卡片（带 dry-run）
 
 ```bash
@@ -427,6 +472,7 @@ cubox-cli/
     card.go               # card list, card detail
     save.go               # save 保存网页
     update.go             # update 更新卡片
+    archive.go            # 批量归档 / 恢复归档
     delete.go             # delete 删除卡片（支持 dry-run）
     annotation.go         # annotation 标注列表
     version.go            # version

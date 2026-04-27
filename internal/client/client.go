@@ -171,6 +171,16 @@ func (c *Client) DeleteCards(ids []string) error {
 	return err
 }
 
+func (c *Client) ArchiveCards(ids []string) error {
+	_, err := c.post("/c/api/cli/cards/archiving", ids)
+	return err
+}
+
+func (c *Client) MoveCards(req *MoveCardsRequest) error {
+	_, err := c.post("/c/api/cli/cards/move", req)
+	return err
+}
+
 func (c *Client) FilterAnnotations(req *AnnotationFilterRequest) ([]Annotation, error) {
 	data, err := c.post("/c/api/cli/annotation/filter", req)
 	if err != nil {
