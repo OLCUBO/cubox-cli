@@ -16,7 +16,7 @@ The official Cubox CLI. Save, search, read, and use what you read with AI. Your 
 | Category | Capabilities                                                                          |
 | -------- | ------------------------------------------------------------------------------------- |
 | Folders  | List and browse card folders                                                      |
-| Tags     | List and browse tag hierarchy                                                         |
+| Tags     | List and browse tag hierarchy; rename, batch delete, and merge tags                   |
 | Cards    | Filter/search cards by folder, tag, starred/read/annotated/archived status, keyword, time range |
 | RAG      | Semantic search via natural language query (intent-based retrieval)                    |
 | Content  | Read full card detail with article content (markdown), annotations, and AI insight    |
@@ -194,6 +194,44 @@ cubox-cli tag list -o text
 ```
 
 **JSON output fields:** `id`, `nested_name`, `name`, `parent_id`
+
+### `cubox-cli tag update`
+
+Rename a tag by ID. The new name applies to the leaf segment only — nested children stay attached and reachable through the new path automatically.
+
+```bash
+cubox-cli tag update --id TAG_ID --new-name NEW_NAME
+```
+
+| Flag                | Description                                          |
+| ------------------- | ---------------------------------------------------- |
+| `--id ID`           | Tag ID to rename (required)                          |
+| `--new-name NAME`   | New leaf name (required; must not contain `/`)       |
+
+### `cubox-cli tag delete`
+
+Batch delete one or more tags by ID. Cards previously tagged with the deleted tag(s) remain; only the tag-card association is removed.
+
+```bash
+cubox-cli tag delete --id TAG_ID[,ID2,...]
+```
+
+| Flag          | Description                                          |
+| ------------- | ---------------------------------------------------- |
+| `--id ID,...` | Tag IDs to delete (comma-separated, required)        |
+
+### `cubox-cli tag merge`
+
+Merge one or more source tags into a target tag. All cards associated with the source tags are re-tagged onto the target, and the source tags are then deleted.
+
+```bash
+cubox-cli tag merge --source SRC_ID[,ID2,...] --target TARGET_ID
+```
+
+| Flag              | Description                                          |
+| ----------------- | ---------------------------------------------------- |
+| `--source ID,...` | Source tag IDs to merge (comma-separated, required)  |
+| `--target ID`     | Target tag ID to merge into (required)               |
 
 ### `cubox-cli card list`
 
@@ -416,6 +454,19 @@ cubox-cli card list --archived --limit 10
 
 # Restore (move back) into a non-archived folder
 cubox-cli unarchive --id 7444025677600260245,7443973659296793971 --folder "Reading List"
+```
+
+### Tidy up tags (rename, delete, merge)
+
+```bash
+# Rename a tag (leaf only — children follow automatically)
+cubox-cli tag update --id 7295070793040398540 --new-name link
+
+# Batch delete tags (cards keep their other tags)
+cubox-cli tag delete --id 7444025677600260245,7443973659296793971
+
+# Merge two tags into a target tag (cards re-tagged, sources deleted)
+cubox-cli tag merge --source 7342187912403881105,7342187917722258501 --target 7247925099053977508
 ```
 
 ### Delete cards (with dry-run)

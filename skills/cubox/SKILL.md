@@ -1,13 +1,13 @@
 ---
 
 name: cubox
-version: 1.0.7
+version: 1.0.8
 description: "Cubox CLI is a callable personal reading memory system that enables you to search, read, and use saved content, perform semantic (RAG-based) queries, access articles, highlights, and metadata, save URLs, update content states, and retrieve annotations and structure such as folders and tags. Use this tool when a task depends on the user’s reading history or requires context from their Cubox library."
 metadata:
   requires:
     bins: ["cubox-cli"]
-
-## cliHelp: "cubox-cli --help"
+  cliHelp: "cubox-cli --help"
+---
 
 # cubox-cli
 
@@ -56,6 +56,35 @@ cubox-cli tag list
 ```
 
 Returns: `[{ "id", "nested_name", "name", "parent_id" }]`
+
+### Manage Tags (rename / delete / merge)
+
+These mutate tags directly. They take **tag IDs** (not names) — call `tag list` first if you only have a name.
+
+```bash
+# Rename a tag — only the leaf segment changes; nested children stay attached
+cubox-cli tag update --id TAG_ID --new-name NEW_NAME
+
+# Batch delete tags — cards keep their other tags; only the tag-card link is removed
+cubox-cli tag delete --id TAG_ID[,ID2,...]
+
+# Merge source tags into a target tag — cards are re-tagged onto the target,
+# then the source tags are deleted
+cubox-cli tag merge --source SRC_ID[,ID2,...] --target TARGET_ID
+```
+
+Flag notes:
+
+- `tag update --new-name` must be a single leaf name; do **not** pass nested paths like `"parent/child"`.
+- `tag merge --source` and `--target` cannot overlap; the CLI rejects a target ID that also appears in source.
+- All three return `{ "count": N, "message": "..." }`.
+
+**Agent guidance:**
+
+- "重命名 / rename / 改名 标签" → `tag update --id ... --new-name ...`. Resolve the ID via `tag list` if the user only gave a name.
+- "删除标签 / delete tags" without specifying replacement → `tag delete --id ...`. Warn the user this only removes the tag association; cards are kept.
+- "合并标签 / merge tags / 把 A、B 合并到 C" → `tag merge --source A,B --target C`. Confirm direction with the user before running, since source tags are destroyed.
+- For tag deletion or merge that touches many cards, list affected cards first with `card list --tag TAG_ID` so the user can preview impact.
 
 ### Filter / Search Cards
 

@@ -110,6 +110,21 @@ func (c *Client) ListTags() ([]Tag, error) {
 	return tags, nil
 }
 
+func (c *Client) UpdateTag(req *TagUpdateRequest) error {
+	_, err := c.post("/c/api/cli/tag/update", req)
+	return err
+}
+
+func (c *Client) DeleteTags(ids []string) error {
+	_, err := c.post("/c/api/cli/tags/delete", ids)
+	return err
+}
+
+func (c *Client) MergeTags(req *TagMergeRequest) error {
+	_, err := c.post("/c/api/cli/tag/merge", req)
+	return err
+}
+
 func (c *Client) FilterCards(req *CardFilterRequest) ([]Card, error) {
 	data, err := c.post("/c/api/cli/card/filter", req)
 	if err != nil {

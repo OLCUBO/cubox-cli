@@ -139,6 +139,16 @@ type RagQueryRequest struct {
 	Query string `json:"query"`
 }
 
+type TagUpdateRequest struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type TagMergeRequest struct {
+	SourceTagIDs []string `json:"source_tag_ids"`
+	TargetTagID  string   `json:"target_tag_id"`
+}
+
 type AnnotationFilterRequest struct {
 	Colors           []string `json:"colors,omitempty"`
 	LastAnnotationID string   `json:"last_annotation_id,omitempty"`
