@@ -17,6 +17,11 @@ coverage.*
 *.coverprofile
 profile.cov
 
+# Stray test sandboxes (e.g. when HOME is overridden in tests but the test
+# accidentally writes through a relative path or Go telemetry kicks in).
+tmp-*-test.*
+**/Library/Application Support/go/telemetry/
+
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
