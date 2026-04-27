@@ -163,7 +163,7 @@ Credentials are stored at `~/.config/cubox-cli/config.json`. `CUBOX_TOKEN` and `
 
 ### Output Formats
 
-All commands support the `-o` / `--output` flag:
+All commands accept the `-o` / `--output` flag. Most data-oriented commands honor it:
 
 
 | Flag        | Description                            |
@@ -172,6 +172,16 @@ All commands support the `-o` / `--output` flag:
 | `-o pretty` | Indented JSON                          |
 | `-o text`   | Human-readable text/tree output        |
 
+
+Note: `save`, `update`, and several `auth` success paths currently print plain text even when `-o json` is selected.
+
+### `cubox-cli version`
+
+Show the installed CLI version.
+
+```bash
+cubox-cli version
+```
 
 ### `cubox-cli folder list`
 
@@ -518,8 +528,8 @@ cubox-cli/
     root.go               # root command, --output flag
     auth.go               # auth login/status/logout
     folder.go             # folder list
-    tag.go                # tag list
-    card.go               # card list, card detail
+    tag.go                # tag list/update/delete/merge
+    card.go               # card list/detail/rag
     save.go               # save web pages
     update.go             # update card
     archive.go            # batch archive / unarchive cards
@@ -529,6 +539,8 @@ cubox-cli/
   internal/
     client/               # HTTP client + API types
     config/               # config file management
+    timefmt/              # flexible time parsing
+    update/               # npm update check
   scripts/                # npm distribution wrapper
   skills/cubox/           # AI Agent skill
   .github/workflows/      # CI/CD

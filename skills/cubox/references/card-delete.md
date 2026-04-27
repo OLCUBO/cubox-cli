@@ -24,14 +24,14 @@ Returns: `{ "dry_run": bool, "count": N, "cards": [...], "message": "..." }`
 
 ## Dry Run Policy for AI Agents
 
-Deleted items will stay in your "Recently Deleted" folder for 30 days before permanent removal.
+Deleted items stay in the user's "Recently Deleted" folder for 30 days before permanent removal, but agents must still treat deletion as destructive.
 
 1. **Always** run with `--dry-run` first before any real deletion.
 2. Present the dry-run result to the user and ask for explicit confirmation.
   - ≤ 3 cards: show the card titles returned by dry-run.
-  - 3 cards: tell the user the count (e.g. "Will delete 25 cards").
+  - > 3 cards: tell the user the count (e.g. "Will delete 25 cards").
 3. Only after the user confirms, run again without `--dry-run` to perform the actual deletion.
-4. Never skip the dry-run step — deletions are irreversible.
+4. Never skip the dry-run step.
 
 ## Example workflow
 

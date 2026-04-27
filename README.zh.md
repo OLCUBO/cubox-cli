@@ -163,7 +163,7 @@ cubox-cli card list --limit 10
 
 ### 输出格式
 
-所有命令支持 `-o` / `--output` 参数：
+所有命令都接受 `-o` / `--output` 参数。大多数数据类命令会按该参数输出：
 
 
 | 参数          | 说明                   |
@@ -172,6 +172,16 @@ cubox-cli card list --limit 10
 | `-o pretty` | 格式化 JSON             |
 | `-o text`   | 人类可读的文本/树形输出         |
 
+
+注意：`save`、`update` 和部分 `auth` 成功路径目前即使选择 `-o json` 也会输出纯文本。
+
+### `cubox-cli version`
+
+显示当前安装的 CLI 版本。
+
+```bash
+cubox-cli version
+```
 
 ### `cubox-cli folder list`
 
@@ -519,8 +529,8 @@ cubox-cli/
     root.go               # 根命令，--output 参数
     auth.go               # auth login/status/logout
     folder.go             # folder list
-    tag.go                # tag list
-    card.go               # card list, card detail
+    tag.go                # tag list/update/delete/merge
+    card.go               # card list/detail/rag
     save.go               # save 保存网页
     update.go             # update 更新卡片
     archive.go            # 批量归档 / 恢复归档
@@ -530,6 +540,8 @@ cubox-cli/
   internal/
     client/               # HTTP 客户端 + API 类型
     config/               # 配置文件管理
+    timefmt/              # 灵活时间解析
+    update/               # npm 更新检查
   scripts/                # npm 分发包装
   skills/cubox/           # AI Agent Skill
   .github/workflows/      # CI/CD
