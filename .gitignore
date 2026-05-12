@@ -46,3 +46,4 @@ go.work.sum
 
 # npm
 node_modules/
+skills/.DS_Store

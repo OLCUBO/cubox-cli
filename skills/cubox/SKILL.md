@@ -1,6 +1,6 @@
 ---
 name: cubox
-version: 1.0.8
+version: 1.0.9
 description: "Cubox CLI is a callable personal reading memory system that enables you to search, read, and use saved content, perform semantic (RAG-based) queries, access articles, highlights, and metadata, save URLs, update content states, and retrieve annotations and structure such as folders and tags. Use this tool when a task depends on the user’s reading history or requires context from their Cubox library."
 metadata:
   requires:
@@ -14,7 +14,7 @@ Manage Cubox bookmarks via the `cubox-cli` command-line tool.
 
 ## Authentication and Secrets
 
-If any command fails with "not logged in", never ask the user to paste their API token into chat and never construct commands that embed a literal token in argv. Use one of these safe paths:
+If any command fails with "API Key does not exist", never ask the user to paste their API token into chat and never construct commands that embed a literal token in argv. Use one of these safe paths:
 
 1. **Interactive login:** ask the user to run `cubox-cli auth login` in their own terminal.
 2. **Agent / CI without persistence:** ask the user to set `CUBOX_SERVER` and `CUBOX_TOKEN` in their shell before invoking the CLI.
